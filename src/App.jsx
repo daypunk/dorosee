@@ -1,21 +1,26 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Navbar from './components/Navbar'
-import Home from './pages/Home'
-import About from './pages/About'
+import { useRive } from '@rive-app/react-canvas'
 
 function App() {
+  const { RiveComponent } = useRive({
+    src: '/chat_dorosee.riv',
+    autoplay: true,
+    useOffscreenRenderer: true,
+    shouldDisableRiveListeners: false,
+  });
+
   return (
-    <Router>
-      <div className="min-h-screen bg-gray-50 font-pretendard">
-        <Navbar />
-        <main className="pt-20">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-          </Routes>
-        </main>
+    <div className="min-h-screen bg-slate-900 flex justify-center pt-20">
+      <div style={{ width: '300px', height: '300px' }}>
+        <RiveComponent 
+          style={{ 
+            width: '100%', 
+            height: '100%',
+            imageRendering: 'auto',
+            opacity: 0.8
+          }}
+        />
       </div>
-    </Router>
+    </div>
   )
 }
 
