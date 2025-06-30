@@ -55,23 +55,24 @@ function PWADetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 text-white flex justify-center items-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-400"></div>
+      <div className="h-screen bg-white text-gray-800 flex justify-center">
+        <div className="w-full max-w-md flex items-center justify-center px-6">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">실종자 정보를 불러오고 있습니다...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!item) {
     return (
-      <div className="min-h-screen bg-slate-900 text-white flex justify-center items-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold mb-4">해당 실종자 정보를 찾을 수 없습니다.</h2>
-          <button 
-            onClick={() => navigate('/pwa')}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            목록으로 돌아가기
-          </button>
+      <div className="h-screen bg-white text-gray-800 flex justify-center">
+        <div className="w-full max-w-md flex items-center justify-center px-6">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold mb-4">해당 실종자 정보를 찾을 수 없습니다.</h2>
+          </div>
         </div>
       </div>
     );
@@ -79,94 +80,107 @@ function PWADetail() {
 
   const photo = item.tknphotoFile
     ? `data:image/jpeg;base64,${item.tknphotoFile}`
-    : 'https://via.placeholder.com/250x300?text=이미지+없음';
+    : null;
+
+  const gender = item.sexdstnDscd === 'M' ? '남성' : item.sexdstnDscd === 'F' ? '여성' : '미상';
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white px-6 py-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="h-screen bg-white text-gray-800 flex justify-center overflow-hidden">
+      <div className="w-full max-w-md flex flex-col px-6 py-8">
         {/* 헤더 */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2 text-blue-400">Dorosee</h1>
-          <h2 className="text-2xl font-semibold">실종자 제보하기</h2>
+        <div className="text-center mb-6">
+          <img src="/dorosee_logo2.svg" alt="Dorosee Logo" className="h-6 mx-auto" />
         </div>
 
-        {/* 실종자 정보 카드 */}
-        <div className="bg-slate-800 rounded-lg p-6 mb-8 shadow-lg">
-          <div className="flex flex-col lg:flex-row gap-6">
-            <div className="lg:w-1/3">
-              <img
-                src={photo}
-                alt="실종자 사진"
-                className="w-full max-w-sm mx-auto rounded-lg shadow-md"
-                onError={(e) => (e.target.src = 'https://via.placeholder.com/250x300?text=이미지+없음')}
-              />
-            </div>
-            <div className="lg:w-2/3">
-              <h3 className="text-3xl font-bold mb-4 text-blue-300">{item.nm || '이름 없음'}</h3>
-              <div className="space-y-3 text-lg">
-                <p><span className="font-semibold text-white">성별:</span> <span className="text-slate-300">{item.sexdstnDscd || '성별 정보 없음'}</span></p>
-                <p><span className="font-semibold text-white">나이:</span> <span className="text-slate-300">{item.age || '나이 없음'}</span></p>
-                <p><span className="font-semibold text-white">실종일:</span> <span className="text-slate-300">{formatDate(item.occrde)}</span></p>
-                <p><span className="font-semibold text-white">주소:</span> <span className="text-slate-300">{item.occrAdres || '주소 없음'}</span></p>
-                <p><span className="font-semibold text-white">구분:</span> <span className="text-slate-300">{writingTrgetDscdMap[item.writngTrgetDscd] || '알 수 없음'}</span></p>
+        {/* 스크롤 가능한 콘텐츠 */}
+        <div className="flex-1 overflow-y-auto space-y-6">
+          {/* 실종자 정보 카드 */}
+          <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-md">
+            <div className="flex gap-4 mb-4">
+              <div className="flex-shrink-0">
+                {photo ? (
+                  <img
+                    src={photo}
+                    alt="실종자 사진"
+                    className="w-20 h-24 object-cover rounded-lg border border-gray-300"
+                    onError={(e) => (e.target.style.display = 'none')}
+                  />
+                ) : (
+                  <div className="w-20 h-24 bg-gray-100 rounded-lg border border-gray-300 flex items-center justify-center">
+                    <span className="text-xs text-gray-500">사진<br/>없음</span>
+                  </div>
+                )}
               </div>
-              <button 
-                onClick={() => navigate('/pwa')} 
-                className="mt-6 bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                목록으로 돌아가기
-              </button>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-xl font-bold text-blue-600 mb-3">{item.nm || '이름 없음'}</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">성별</span>
+                    <span className="text-gray-800 font-medium">{gender}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">나이</span>
+                    <span className="text-gray-800 font-medium">{item.age || '미상'}세</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">실종일</span>
+                    <span className="text-gray-800 font-medium">{formatDate(item.occrde)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="border-t border-gray-200 pt-3">
+              <span className="text-gray-600 text-xs">실종장소</span>
+              <p className="text-gray-800 text-sm leading-relaxed mt-1">{item.occrAdres || '주소 없음'}</p>
             </div>
           </div>
-        </div>
 
-        {/* 제보 폼 */}
-        <div className="bg-slate-800 rounded-lg p-6 shadow-lg">
-          <form 
-            onSubmit={(e) => {
-              e.preventDefault();
-              navigate('/pwa/thankyou');
-            }}
-          >
-            <h2 className="text-2xl font-bold mb-2 text-blue-300">제보내용</h2>
-            <p className="text-slate-300 mb-6">상세히 기입해 주시면 실종자를 더 빨리 찾을 수 있습니다.</p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <input 
-                type="text" 
-                placeholder="목격 장소" 
-                required 
-                className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-              />
-              <input 
-                type="text" 
-                placeholder="목격 시간" 
-                required 
-                className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-              />
-            </div>
-
-            <input 
-              type="text" 
-              placeholder="인상착의" 
-              required 
-              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-4"
-            />
-            
-            <textarea 
-              placeholder="비고" 
-              required 
-              rows="4"
-              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-6 resize-none"
-            />
-            
-            <button 
-              type="submit" 
-              className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-800"
+          {/* 제보 폼 */}
+          <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-md">
+            <form 
+              onSubmit={(e) => {
+                e.preventDefault();
+                navigate('/pwa/thankyou');
+              }}
             >
-              제보하기
-            </button>
-          </form>
+              <h2 className="text-lg font-bold mb-2 text-blue-600">제보내용</h2>
+              <p className="text-gray-600 text-sm mb-4">상세히 기입해 주시면 실종자를 더 빨리 찾을 수 있습니다.</p>
+
+              <div className="space-y-3">
+                <input 
+                  type="text" 
+                  placeholder="목격 장소" 
+                  required 
+                  className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm"
+                />
+                <input 
+                  type="text" 
+                  placeholder="목격 시간" 
+                  required 
+                  className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm"
+                />
+                <input 
+                  type="text" 
+                  placeholder="인상착의" 
+                  required 
+                  className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm"
+                />
+                <textarea 
+                  placeholder="기타 특이사항" 
+                  required 
+                  rows="3"
+                  className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none text-sm"
+                />
+                
+                <button 
+                  type="submit" 
+                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium active:bg-blue-700 transition-colors focus:outline-none text-sm"
+                >
+                  제보하기
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
