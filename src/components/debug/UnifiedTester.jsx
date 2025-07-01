@@ -38,9 +38,10 @@ const UnifiedTester = () => {
     await new Promise(resolve => setTimeout(resolve, 100));
     
     addLog('Loading Dorosee Test Suite v2.0', 'system');
+    addLog(`Environment: ${window.location.hostname}`, 'system');
     await new Promise(resolve => setTimeout(resolve, 100));
     
-    // ENV 테스트 - 즉시 실행
+    // ENV 테스트 - 더 상세한 진단
     addLog('> Checking environment variables...', 'test');
     await new Promise(resolve => setTimeout(resolve, 200));
     
@@ -48,17 +49,26 @@ const UnifiedTester = () => {
       { name: 'WEATHER_API_KEY', value: import.meta.env.VITE_WEATHER_API_KEY },
       { name: 'KAKAO_API_KEY', value: import.meta.env.VITE_KAKAO_API_KEY },
       { name: 'OPENAI_API_KEY', value: import.meta.env.VITE_OPENAI_API_KEY },
-      { name: 'TTSMAKER_API_KEY', value: import.meta.env.VITE_TTSMAKER_API_KEY }
+      { name: 'TTSMAKER_API_KEY', value: import.meta.env.VITE_TTSMAKER_API_KEY },
+      { name: 'MISSING_PERSON_ESNTL_ID', value: import.meta.env.VITE_MISSING_PERSON_ESNTL_ID },
+      { name: 'MISSING_PERSON_AUTH_KEY', value: import.meta.env.VITE_MISSING_PERSON_AUTH_KEY }
     ];
     
+    let envOkCount = 0;
     for (const env of envVars) {
       if (env.value && env.value !== 'your_api_key_here') {
-        addLog(`${env.name}: ${env.value.slice(0, 8)}...${env.value.slice(-4)}`, 'success');
+        const maskedValue = env.value.length > 8 
+          ? `${env.value.slice(0, 8)}...${env.value.slice(-4)}`
+          : '***';
+        addLog(`${env.name}: ${maskedValue} [OK]`, 'success');
+        envOkCount++;
       } else {
-        addLog(`${env.name}: NOT_FOUND`, 'warn');
+        addLog(`${env.name}: NOT_FOUND [FAIL]`, 'warn');
       }
       await new Promise(resolve => setTimeout(resolve, 50));
     }
+    
+    addLog(`Environment Status: ${envOkCount}/${envVars.length} variables found`, envOkCount > 0 ? 'success' : 'warn');
 
     // 기본 위치 테스트 (서울시청)
     addLog('> Testing basic location services...', 'test');
@@ -68,22 +78,38 @@ const UnifiedTester = () => {
       const lat = 37.5665, lon = 126.9780;
       addLog(`Using default location: ${lat}, ${lon}`, 'info');
       
-      // 카카오맵 테스트
+      // 카카오맵 테스트 - 더 상세한 에러 정보
       addLog('> Testing Kakao Maps API...', 'test');
-      const address = await kakaoLocationService.getCurrentAddress(lat, lon);
-      addLog(`ADDRESS: ${address.fullAddress}`, 'success');
+      try {
+        const address = await kakaoLocationService.getCurrentAddress(lat, lon);
+        addLog(`ADDRESS: ${address.fullAddress} [OK]`, 'success');
+        
+        // 지하철역 검색 테스트
+        const stations = await kakaoLocationService.searchNearbyByCategory(lat, lon, 'SW8', 1000);
+        addLog(`SUBWAY_STATIONS: Found ${stations.length} stations [OK]`, 'success');
+        
+      } catch (kakakoError) {
+        addLog(`KAKAO_API_ERROR: ${kakakoError.message}`, 'warn');
+        addLog(`Check if KAKAO_API_KEY is set correctly in Vercel`, 'warn');
+      }
       
-      // 날씨 테스트
+      // 날씨 테스트 - 더 상세한 에러 정보
       addLog('> Testing weather services...', 'test');
-      const weather = await weatherService.getCurrentWeather(lat, lon, address);
-      addLog(`WEATHER: ${weather.temp}C ${weather.condition}`, 'success');
+      try {
+        const weather = await weatherService.getCurrentWeather(lat, lon);
+        addLog(`WEATHER: ${weather.temp}C ${weather.condition} [${weather.source || 'API'}]`, 'success');
+      } catch (weatherError) {
+        addLog(`WEATHER_ERROR: ${weatherError.message}`, 'warn');
+        addLog(`Using fallback weather service...`, 'info');
+      }
       
       addLog('> Test sequence completed', 'system');
       addLog('SYSTEM STATUS: OPERATIONAL', 'system');
       
     } catch (error) {
-      addLog(`ERROR: ${error.message}`, 'warn');
+      addLog(`CRITICAL_ERROR: ${error.message}`, 'warn');
       addLog('SYSTEM STATUS: PARTIAL', 'system');
+      addLog('TIP: Check Vercel environment variables', 'info');
     }
     
     setIsRunning(false);

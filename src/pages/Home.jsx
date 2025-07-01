@@ -367,11 +367,11 @@ function Home() {
         </button>
       </motion.div>
 
-      {/* 챗봇 모달 - 비활성화 */}
-      {/* <ChatBot 
+      {/* 챗봇 모달 */}
+      <ChatBot 
         isOpen={isChatBotOpen} 
         onClose={() => setIsChatBotOpen(false)} 
-      /> */}
+      />
       </div>
     </>
   )
