@@ -169,6 +169,95 @@ class KakaoLocationService {
     
     return region2 || '알 수 없는 위치';
   }
+
+  // 🎯 사용자 질문에 맞는 주변 검색 + 친근한 조언
+  async searchNearbyWithAdvice(userInput, lat, lng) {
+    try {
+      const inputLower = userInput.toLowerCase();
+      let searchQuery = '';
+      let categoryCode = '';
+      
+      // 사용자 질문 분석
+      if (inputLower.includes('편의점')) {
+        categoryCode = 'CS2';
+        searchQuery = '편의점';
+      } else if (inputLower.includes('지하철') || inputLower.includes('역')) {
+        categoryCode = 'SW8';
+        searchQuery = '지하철역';
+      } else if (inputLower.includes('병원')) {
+        categoryCode = 'HP8';
+        searchQuery = '병원';
+      } else if (inputLower.includes('은행')) {
+        categoryCode = 'BK9';
+        searchQuery = '은행';
+      } else if (inputLower.includes('마트') || inputLower.includes('대형마트')) {
+        categoryCode = 'MT1';
+        searchQuery = '마트';
+      } else if (inputLower.includes('주차장')) {
+        categoryCode = 'PK6';
+        searchQuery = '주차장';
+      } else if (inputLower.includes('카페')) {
+        searchQuery = '카페';
+      } else if (inputLower.includes('식당') || inputLower.includes('맛집')) {
+        searchQuery = '식당';
+      } else {
+        // 키워드 추출 시도
+        const keywords = inputLower.match(/(편의점|지하철|역|병원|은행|마트|주차장|카페|식당)/);
+        if (keywords) {
+          searchQuery = keywords[0];
+        } else {
+          searchQuery = '편의점'; // 기본값
+        }
+      }
+
+      // 검색 실행
+      let places = [];
+      if (categoryCode) {
+        places = await this.searchNearbyByCategory(lat, lng, categoryCode, 1000);
+      } else {
+        places = await this.searchNearbyPlaces(lat, lng, searchQuery, 1000);
+      }
+
+      if (places.length === 0) {
+        return `주변에 ${searchQuery}를 찾지 못했어요. 조금 더 먼 곳을 검색해보거나 다른 장소를 찾아보시는 게 어떨까요?`;
+      }
+
+      // 가장 가까운 곳 3개 선택
+      const nearestPlaces = places.slice(0, 3);
+      const closest = nearestPlaces[0];
+      
+      // 도보 시간 계산
+      const walkingTime = this.calculateWalkingTime(closest.distance);
+      
+      // 친근한 응답 생성
+      let response = `가장 가까운 ${searchQuery}는 ${closest.name}이에요! `;
+      
+      if (walkingTime <= 5) {
+        response += `아주 가까우니까 천천히 걸어가시면 돼요.`;
+      } else if (walkingTime <= 10) {
+        response += `조금 걸리지만 산책 삼아 가시면 좋을 것 같아요.`;
+      } else {
+        response += `좀 멀긴 하지만 날씨가 좋으면 걸어가시는 것도 좋아요.`;
+      }
+      
+      if (closest.address) {
+        // 간단한 주소만 표시 (구체적인 번지 제거)
+        const simpleAddress = closest.address.split(' ').slice(0, 3).join(' ');
+        response += ` ${simpleAddress} 쪽에 있어요.`;
+      }
+
+      // 다른 옵션 제시 (거리 정보 없이)
+      if (nearestPlaces.length > 1) {
+        response += ` 다른 옵션으로는 ${nearestPlaces[1].name}도 있어요!`;
+      }
+
+      return response;
+
+    } catch (error) {
+      console.error('위치 검색 및 조언 생성 오류:', error);
+      return "죄송해요, 지금 주변 정보를 확인하기 어려워요. 혹시 찾으시는 곳의 구체적인 이름이나 주소를 알려주시면 도와드릴게요!";
+    }
+  }
 }
 
 export default new KakaoLocationService();
