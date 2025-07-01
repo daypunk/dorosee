@@ -27,8 +27,8 @@ function PWAIndex() {
           
         const res = await axios.get(apiUrl, {
           params: {
-            esntlId: 10000764,
-            authKey: '197f67addf144f4e',
+            esntlId: import.meta.env.VITE_MISSING_PERSON_ESNTL_ID || 10000764,
+            authKey: import.meta.env.VITE_MISSING_PERSON_AUTH_KEY || '197f67addf144f4e',
             rowSize: 6,
             format: 'json'
           }
