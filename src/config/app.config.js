@@ -8,10 +8,6 @@ export const API_CONFIG = {
     MODEL: 'gpt-4o',
     TTS_MODEL: 'tts-1'
   },
-  PERPLEXITY: {
-    ENDPOINT: 'https://api.perplexity.ai/chat/completions',
-    MODEL: 'llama-3.1-sonar-small-128k-online'
-  },
   WEATHER: {
     KMA_ENDPOINT: 'https://apihub.kma.go.kr/api/typ01/cgi-bin/url/nph-aws2_min',
     OPENWEATHER_ENDPOINT: 'https://api.openweathermap.org/data/2.5/weather'

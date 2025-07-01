@@ -1,10 +1,10 @@
 import { useCallback } from 'react';
-import { EMERGENCY_KEYWORDS, NON_EMERGENCY_KEYWORDS } from '../utils/constants';
+import { KEYWORDS } from '../config/app.config';
 
 const useEmergencyDetection = () => {
   // 비전문 키워드와 '사고' 조합 예외 처리
   const isNonEmergencyAccident = useCallback((text) => {
-    return NON_EMERGENCY_KEYWORDS.some(keyword => text.includes(keyword));
+    return KEYWORDS.NON_EMERGENCY.some(keyword => text.includes(keyword));
   }, []);
 
   const detectEmergency = useCallback((text) => {
@@ -14,7 +14,7 @@ const useEmergencyDetection = () => {
     }
 
     // 응급상황 키워드 검사
-    return EMERGENCY_KEYWORDS.some(keyword => text.includes(keyword));
+    return KEYWORDS.EMERGENCY.some(keyword => text.includes(keyword));
   }, [isNonEmergencyAccident]);
 
   const getEmergencyResponse = useCallback(() => {

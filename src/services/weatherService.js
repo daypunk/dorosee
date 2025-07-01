@@ -1,4 +1,4 @@
-import { API_ENDPOINTS } from '../utils/constants';
+import { API_CONFIG } from '../config/app.config';
 import alternativeWeatherService from './alternativeWeatherService.js';
 
 class WeatherService {
@@ -9,8 +9,6 @@ class WeatherService {
       location: '서울'
     };
   }
-
-
 
   async getCurrentWeather(lat = 37.5665, lon = 126.9780, address = null) {
     const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
@@ -47,12 +45,10 @@ class WeatherService {
     }
   }
 
-
-
   async getOpenWeatherMap(lat, lon, apiKey) {
     try {
       const response = await fetch(
-        `${API_ENDPOINTS.WEATHER}?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=kr`
+        `${API_CONFIG.WEATHER.OPENWEATHER_ENDPOINT}?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=kr`
       );
       
       if (!response.ok) {

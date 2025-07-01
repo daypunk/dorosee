@@ -1,7 +1,4 @@
-import { 
-  DOROSE_SPECIALTY_KEYWORDS,
-  API_ENDPOINTS 
-} from '../utils/constants';
+import { API_CONFIG, KEYWORDS } from '../config/app.config';
 import { retryOperation } from '../utils/helpers';
 import kakaoLocationService from './kakaoLocationService';
 import accessibilityWeatherService from './accessibilityWeatherService';
@@ -141,10 +138,9 @@ class AIService {
       }
     }
 
-    // 3. 🚫 Perplexity 비활성화 - OpenAI로 대체
+    // 3. 실시간 정보 필요 시 OpenAI 처리
     const isRealTimeQuery = this.needsRealTimeInfo(inputLower);
     if (isRealTimeQuery) {
-      // Perplexity 대신 OpenAI로 실시간 정보 처리
       const openaiKey = import.meta.env.VITE_OPENAI_API_KEY;
       if (openaiKey && openaiKey.startsWith('sk-')) {
         try {
@@ -197,7 +193,7 @@ class AIService {
   }
 
   isSpecialtyTopic(inputLower) {
-    return DOROSE_SPECIALTY_KEYWORDS.some(keyword => inputLower.includes(keyword));
+    return KEYWORDS.SPECIALTY.some(keyword => inputLower.includes(keyword));
   }
 
   needsRealTimeInfo(inputLower) {
@@ -212,14 +208,14 @@ class AIService {
 
   // OpenAI API - 실시간 정보용 (친근한 도심 커뮤니케이터)
   async callOpenAIForRealtime(userInput) {
-    const response = await fetch(API_ENDPOINTS.OPENAI, {
+    const response = await fetch(API_CONFIG.OPENAI.ENDPOINT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: API_CONFIG.OPENAI.MODEL,
         messages: [
           {
             role: 'system',
@@ -249,14 +245,14 @@ class AIService {
 
   // OpenAI API - 기본 질문용 (친근한 도심 커뮤니케이터)  
   async callOpenAI(userInput, isSpecialty) {
-    const response = await fetch(API_ENDPOINTS.OPENAI, {
+    const response = await fetch(API_CONFIG.OPENAI.ENDPOINT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: API_CONFIG.OPENAI.MODEL,
         messages: [
           {
             role: 'system',
