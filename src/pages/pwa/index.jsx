@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useRive } from '@rive-app/react-canvas';
 import { motion } from 'framer-motion';
@@ -21,20 +20,28 @@ function PWAIndex() {
     const fetchData = async () => {
       try {
         // 로컬 개발환경에서는 프록시 사용, 배포환경에서는 직접 호출
-        const apiUrl = window.location.hostname === 'localhost' 
+        const baseUrl = window.location.hostname === 'localhost' 
           ? '/api/lcm/findChildList.do'
           : 'https://www.safe182.go.kr/api/lcm/findChildList.do';
-          
-        const res = await axios.get(apiUrl, {
-          params: {
-            esntlId: import.meta.env.VITE_MISSING_PERSON_ESNTL_ID || 10000764,
-            authKey: import.meta.env.VITE_MISSING_PERSON_AUTH_KEY || '197f67addf144f4e',
-            rowSize: 6,
-            format: 'json'
-          }
+        
+        // URL 파라미터 생성
+        const params = new URLSearchParams({
+          esntlId: import.meta.env.VITE_MISSING_PERSON_ESNTL_ID || 10000764,
+          authKey: import.meta.env.VITE_MISSING_PERSON_AUTH_KEY || '197f67addf144f4e',
+          rowSize: 6,
+          format: 'json'
         });
-        console.log(res.data);
-        setMissingList(res.data.list || []);
+        
+        const apiUrl = `${baseUrl}?${params}`;
+        const response = await fetch(apiUrl);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log(data);
+        setMissingList(data.list || []);
       } catch (err) {
         console.error('API 오류:', err);
       } finally {

@@ -41,7 +41,7 @@ UI: TailwindCSS + Framer Motion
 음성: Web Speech API + OpenAI TTS
 지도: 카카오맵 API
 라우팅: React Router
-HTTP: Axios
+HTTP: Fetch API
 ```
 
 ## 🛠️ 설치 및 실행
@@ -68,7 +68,7 @@ npm run dev
 
 ```bash
 # OpenAI (TTS/채팅)
-VITE_OPENAI_API_KEY=your-openai-key
+VITE_OPENAI_API_KEY=sk-your-openai-key
 
 # 카카오맵 (위치 서비스)
 VITE_KAKAO_API_KEY=your-kakao-key
