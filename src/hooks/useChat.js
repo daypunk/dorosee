@@ -22,10 +22,11 @@ export const useChat = () => {
       // 위치 정보 가져오기
       const location = await getCurrentLocation()
       
+      // accessibilityProfile에 위치 정보 포함
+      const accessibilityProfile = location ? { location } : {}
+      
       // AI 서비스로 응답 생성
-      const response = location 
-        ? await aiService.generateLocationBasedResponse(userMessage, location)
-        : await aiService.generateResponse(userMessage)
+      const response = await aiService.generateResponse(userMessage, accessibilityProfile)
 
       // AI 응답 추가
       const aiMsg = {
@@ -70,7 +71,8 @@ export const useChat = () => {
           },
           () => {
             resolve(null)
-          }
+          },
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
         )
       } else {
         resolve(null)

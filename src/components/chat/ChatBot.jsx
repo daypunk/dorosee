@@ -103,6 +103,12 @@ const ChatBot = ({ isOpen, onClose }) => {
         }));
       }).catch(error => {
         console.error('날씨 정보 오류:', error);
+        // 기상청 API 오류 시 최소한의 기본값만 설정
+        setWeatherData(prev => ({
+          ...prev,
+          temp: '?',
+          condition: 'API 오류'
+        }));
       });
     }
   }, [location]);
@@ -146,7 +152,7 @@ const ChatBot = ({ isOpen, onClose }) => {
 
     // 일반 응답 생성
     try {
-      const response = await generateResponse(text, location, accessibilityProfile);
+      const response = await generateResponse(text, location, accessibilityProfile, weatherData);
       
       const botMessage = {
         id: Date.now() + 1,

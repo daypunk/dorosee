@@ -165,7 +165,7 @@ const InlineChat = ({ isOpen, onClose }) => {
                 <div className="flex-1 text-center">
                   {isListening ? (
                     <div className="text-red-500 text-sm font-medium">
-                      듣고 있어요... 🎤
+                      듣고 있어요...
                     </div>
                   ) : (
                     <div className="text-slate-500 text-sm">

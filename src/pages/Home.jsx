@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useRive } from '@rive-app/react-canvas'
 import { motion } from 'framer-motion'
 import { useState, useEffect, useRef } from 'react'
@@ -10,6 +10,7 @@ import useAdvancedTTS from '../hooks/useAdvancedTTS'
 
 function Home() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [isChatBotOpen, setIsChatBotOpen] = useState(false)
   const [isChatMode, setIsChatMode] = useState(false)
   const [isListening, setIsListening] = useState(false)
@@ -20,6 +21,50 @@ function Home() {
   
   const { messages, sendMessage, isLoading, clearMessages } = useChat()
   const { speakText, stopSpeaking, initializeSpeech } = useAdvancedTTS()
+  
+  // 권한 요청 함수
+  const requestPermissions = async () => {
+    try {
+      console.log('🎤 마이크 및 위치 권한 요청 시작...')
+      
+      // 1. 마이크 권한 요청
+      try {
+        await navigator.mediaDevices.getUserMedia({ audio: true })
+        console.log('✅ 마이크 권한 승인됨')
+      } catch (micError) {
+        console.log('❌ 마이크 권한 거부됨:', micError.message)
+      }
+      
+      // 2. 위치 권한 요청
+      try {
+        await new Promise((resolve, reject) => {
+          if (!navigator.geolocation) {
+            reject(new Error('Geolocation not supported'))
+            return
+          }
+          
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              console.log('✅ 위치 권한 승인됨')
+              resolve(position)
+            },
+            (error) => {
+              console.log('❌ 위치 권한 거부됨:', error.message)
+              reject(error)
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+          )
+        })
+      } catch (locationError) {
+        console.log('❌ 위치 서비스 오류:', locationError.message)
+      }
+      
+      console.log('🔧 권한 요청 완료')
+      
+    } catch (error) {
+      console.log('❌ 권한 요청 중 오류:', error.message)
+    }
+  }
   
   const { RiveComponent } = useRive({
     src: '/chat_dorosee.riv',
@@ -129,6 +174,17 @@ function Home() {
       timeoutRef.current = null
     }
   }
+
+  // 페이지 로드 시 권한 요청
+  useEffect(() => {
+    // PWA 페이지에서는 권한 요청 하지 않음
+    if (location.pathname.startsWith('/pwa')) {
+      console.log('🚫 PWA 페이지에서는 권한 요청을 하지 않습니다.')
+      return
+    }
+    
+    requestPermissions()
+  }, [location.pathname])
 
   // 챗봇 테스트 이벤트 리스너
   useEffect(() => {
@@ -310,7 +366,7 @@ function Home() {
                 <div className="text-white">
                   {isListening ? (
                     <div className="text-sm font-medium">
-                      듣고 있어요... 🎤
+                      듣고 있어요...
                     </div>
                   ) : (
                     <div className="text-sm">

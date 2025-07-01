@@ -10,6 +10,11 @@ export default defineConfig({
         target: 'https://www.safe182.go.kr',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '/api')
+      },
+      '/weather-api': {
+        target: 'https://apis.data.go.kr',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/weather-api/, '')
       }
     }
   }

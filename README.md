@@ -23,9 +23,10 @@
 - **현재 위치**: 카카오맵 기반 정확한 주소 정보
 
 ### 🌤️ 날씨 정보
-- 실시간 날씨 상태와 온도
+- 기상청 단기예보 API 기반 정확한 날씨 정보
+- 실시간 기온, 강수형태, 하늘상태
 - 상황별 맞춤 조언 ("우산 꼭 챙기시고", "따뜻하게 입으세요" 등)
-- 위치 기반 지역별 날씨
+- GPS 좌표 자동 변환으로 정확한 지역별 날씨
 
 ### 👥 실종자 제보
 - 실시간 실종자 정보 조회
@@ -73,12 +74,12 @@ VITE_OPENAI_API_KEY=sk-your-openai-key
 # 카카오맵 (위치 서비스)
 VITE_KAKAO_API_KEY=your-kakao-key
 
+# 기상청 단기예보 API (날씨 정보)
+VITE_WEATHER_API_KEY=your-kma-servicekey
+
 # 실종자 API
 VITE_MISSING_PERSON_ESNTL_ID=your-esntl-id
 VITE_MISSING_PERSON_AUTH_KEY=your-auth-key
-
-# 기상청 API (선택)
-VITE_WEATHER_API_KEY=your-weather-key
 
 # TTSMaker (선택)
 VITE_TTSMAKER_API_KEY=your-ttsmaker-key
@@ -97,7 +98,7 @@ src/
 ├── services/           # API 서비스
 │   ├── aiService.js    # AI 응답 생성
 │   ├── kakaoLocationService.js # 위치 서비스
-│   └── weatherService.js # 날씨 정보
+│   └── weatherService.js # 날씨 정보 (기상청 API)
 ├── pages/
 │   ├── Home.jsx        # 메인 화면
 │   └── pwa/            # 실종자 제보 시스템

@@ -1,5 +1,5 @@
-import weatherService from './weatherService';
 import kakaoLocationService from './kakaoLocationService';
+import weatherService from './weatherService';
 
 class AccessibilityWeatherService {
   constructor() {
@@ -22,21 +22,21 @@ class AccessibilityWeatherService {
         console.log('주소 정보 가져오기 실패:', error);
       }
       
-      // 3. 날씨 데이터 가져오기 (위치 + 주소 정보 전달)
+      // 3. 기상청 API로 날씨 데이터 가져오기
       const weatherData = await this.weatherService.getCurrentWeather(
         location.lat, 
         location.lon,
         address
       );
       
-      // 4. 강제로 간단한 응답만 생성 (다른 API 호출 방지)
+      // 4. 간단한 응답 생성
       const response = this.generateSimpleWeatherOnly(weatherData, location, accessibilityProfile);
       console.log('날씨 서비스 최종 응답:', response, `(길이: ${response.length}자)`);
       return response;
       
     } catch (error) {
       console.error('접근성 날씨 서비스 오류:', error);
-      return this.getDefaultWeatherResponse(accessibilityProfile);
+      throw error;
     }
   }
 
@@ -147,16 +147,6 @@ class AccessibilityWeatherService {
     return '좋은 하루 되세요';
   }
 
-  // 기본 날씨 응답 (오류 시) - 친근하게
-  getDefaultWeatherResponse(accessibilityProfile) {
-    const fallbackResponses = [
-      "죄송해요, 지금 날씨 정보를 확인하기 어려워요. 혹시 다른 도움이 필요하시면 말씀해주세요!",
-      "날씨 정보를 가져올 수 없네요. 외출하실 때는 혹시 모르니 우산 하나 챙기시는 게 어떨까요?",
-      "아쉽게도 날씨 데이터를 불러오지 못했어요. 대신 안전한 길 안내는 도와드릴 수 있어요!"
-    ];
-    return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
-  }
-
   // 날씨 질문 감지
   isWeatherQuery(userInput) {
     const weatherKeywords = [
@@ -167,6 +157,44 @@ class AccessibilityWeatherService {
     
     const inputLower = userInput.toLowerCase();
     return weatherKeywords.some(keyword => inputLower.includes(keyword));
+  }
+
+  // ChatBot 프로필용 - 날씨 데이터만 반환 (응답 문자열 아님)
+  async getWeatherData(userLat, userLon) {
+    try {
+      // 1. 사용자 위치 감지 (파라미터가 없으면 자동 감지)
+      let location;
+      if (userLat && userLon) {
+        location = { lat: userLat, lon: userLon, city: '현재 위치' };
+      } else {
+        location = await this.detectUserLocation();
+      }
+      
+      // 2. 카카오맵으로 상세 주소 정보 가져오기
+      let address = null;
+      try {
+        address = await kakaoLocationService.getCurrentAddress(location.lat, location.lon);
+      } catch (error) {
+        console.log('주소 정보 가져오기 실패:', error);
+      }
+      
+      // 3. 기상청 API로 날씨 데이터 가져오기
+      const weatherData = await this.weatherService.getCurrentWeather(
+        location.lat, 
+        location.lon,
+        address
+      );
+      
+      // 4. 위치 정보 추가하여 반환
+      return {
+        ...weatherData,
+        location: address ? kakaoLocationService.getShortAddress(address) : location.city
+      };
+      
+    } catch (error) {
+      console.error('날씨 데이터 가져오기 오류:', error);
+      throw error; // 기본값 반환하지 않고 오류 전파
+    }
   }
 }
 

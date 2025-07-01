@@ -9,8 +9,8 @@ export const API_CONFIG = {
     TTS_MODEL: 'tts-1'
   },
   WEATHER: {
-    KMA_ENDPOINT: 'https://apihub.kma.go.kr/api/typ01/cgi-bin/url/nph-aws2_min',
-    OPENWEATHER_ENDPOINT: 'https://api.openweathermap.org/data/2.5/weather'
+    KMA_FORECAST_ENDPOINT: 'https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst',
+    KMA_CURRENT_ENDPOINT: 'https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst'
   }
 };
 
@@ -72,11 +72,6 @@ export const KEYWORDS = {
     '날씨', '비', '예보', '기온', '온도', '태풍', '홍수', '눈', '바람', 
     '도로시', '기능', '도움', '안내', '서비스',
     '안녕', '반가', '고마워', '고맙다', '처음', '나이', '몇살'
-  ],
-  REALTIME: [
-    '오늘', '지금', '현재', '최신', '요즘', '이번주', '이번달',
-    '상황', '전상', '운행', '고장', '지연',
-    '영업시간', '운영시간', '몇시', '언제'
   ]
 };
 
@@ -98,7 +93,8 @@ export const APP_CONFIG = {
 export const validateEnvironment = () => {
   const required = [
     'VITE_OPENAI_API_KEY',
-    'VITE_KAKAO_API_KEY'
+    'VITE_KAKAO_API_KEY',
+    'VITE_WEATHER_API_KEY'
   ];
   
   const missing = required.filter(key => !import.meta.env[key]);

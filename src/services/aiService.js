@@ -62,59 +62,26 @@ class AIService {
   }
 
   // 🎯 짧은 위치 기반 응답 생성
-  async generateLocationBasedResponse(userInput, location) {
-    const inputLower = userInput.toLowerCase();
-    
-    const locationKeywords = ['길', '가는법', '지하철', '역', '버스', '편의점', '위치', '어디', '주변'];
-    const isLocationQuery = locationKeywords.some(keyword => inputLower.includes(keyword));
-    
-    if (isLocationQuery && location) {
-      try {
-        // 지하철역 검색 - 가장 가까운 1개만
-        if (inputLower.includes('지하철') || inputLower.includes('역')) {
-          const stations = await kakaoLocationService.searchNearbyByCategory(
-            location.latitude, location.longitude, 'SW8', 1000
-          );
-          
-          if (stations.length > 0) {
-            const closest = stations[0];
-            const walkTime = kakaoLocationService.calculateWalkingTime(closest.distance);
-            return `가장 가까운 지하철역은 ${closest.name}이에요! 걸어서 약 ${walkTime}분 정도 걸려요. 안전하게 가세요~`;
-          }
-          return "아쉽게도 근처에 지하철역이 없네요. 혹시 버스정류장이나 다른 교통수단 정보가 필요하시면 말씀해주세요!";
+  async generateLocationBasedResponse(userInput, location, currentWeatherData = null) {
+    try {
+      // 날씨 관련 위치 질문
+      if (accessibilityWeatherService.isWeatherQuery(userInput)) {
+        if (currentWeatherData) {
+          return this.generateWeatherResponseFromData(currentWeatherData, userInput);
         }
-        
-        // 편의점 검색 - 가장 가까운 1개만
-        if (inputLower.includes('편의점')) {
-          const stores = await kakaoLocationService.searchNearbyByCategory(
-            location.latitude, location.longitude, 'CS2', 800
-          );
-          
-          if (stores.length > 0) {
-            const closest = stores[0];
-            const walkTime = kakaoLocationService.calculateWalkingTime(closest.distance);
-            return `바로 근처에 ${closest.name}이 있어요! 걸어서 ${walkTime}분이면 도착해요. 필요한 거 있으시면 들러보세요~`;
-          }
-          return "아쉽게도 가까운 편의점이 없네요. 조금 더 걸어가시면 찾을 수 있을 거예요!";
-        }
-        
-        // 위치 정보
-        if (inputLower.includes('위치') || inputLower.includes('어디')) {
-          const address = await kakaoLocationService.getCurrentAddress(location.latitude, location.longitude);
-          const shortAddress = kakaoLocationService.getShortAddress(address);
-          return `지금 계신 곳은 ${shortAddress}이에요! 주변에 어디 가고 싶은 곳이 있으시면 알려주세요~`;
-        }
-        
-      } catch (error) {
-        console.error('위치 서비스 오류:', error);
-        return "아쉽게도 위치 정보를 가져올 수 없네요. 혹시 다른 도움이 필요하시면 말씀해주세요!";
+        return await accessibilityWeatherService.getSimpleWeatherResponse(userInput);
       }
+        
+      // 주변 정보 검색 (편의점, 지하철역 등)
+      return await kakaoLocationService.searchNearbyWithAdvice(userInput, location.latitude, location.longitude);
+        
+    } catch (error) {
+      console.error('위치 기반 응답 오류:', error);
+      return "죄송해요, 지금 그 정보를 확인하기 어려워요. 혹시 찾으시는 곳의 구체적인 주소나 동네 이름을 알려주시면 도와드릴게요!";
     }
-    
-    return await this.generateResponse(userInput);
   }
 
-  async generateResponse(userInput, accessibilityProfile = {}) {
+  async generateResponse(userInput, accessibilityProfile = {}, currentWeatherData = null) {
     const inputLower = userInput.toLowerCase();
 
     // 1. 이름 질문 - 친근한 자기소개
@@ -127,9 +94,15 @@ class AIService {
       return introResponses[Math.floor(Math.random() * introResponses.length)];
     }
 
-    // 2. 날씨 질문 - 응답 길이 제한
+    // 2. 날씨 질문 - 현재 데이터 우선 사용
     if (accessibilityWeatherService.isWeatherQuery(userInput)) {
       try {
+        // 전달받은 현재 날씨 데이터가 있으면 우선 사용
+        if (currentWeatherData) {
+          const response = this.generateWeatherResponseFromData(currentWeatherData, userInput);
+          return response;
+        }
+        // 없으면 기존 방식 사용
         const weatherResponse = await accessibilityWeatherService.getSimpleWeatherResponse(userInput, accessibilityProfile);
         return weatherResponse;
       } catch (error) {
@@ -138,22 +111,27 @@ class AIService {
       }
     }
 
-    // 3. 실시간 정보 필요 시 OpenAI 처리
-    const isRealTimeQuery = this.needsRealTimeInfo(inputLower);
-    if (isRealTimeQuery) {
-      const openaiKey = import.meta.env.VITE_OPENAI_API_KEY;
-      if (openaiKey && openaiKey.startsWith('sk-')) {
-        try {
-          const response = await this.callOpenAIForRealtime(userInput);
-          return response;
-        } catch (error) {
-          console.error('OpenAI 실시간 정보 오류:', error);
-          return "죄송해요, 지금 실시간 정보를 확인하기 어려워요. 혹시 다른 것으로 도와드릴까요?";
+    // 3. 위치 서비스 - 편의점, 길찾기 등
+    if (this.needsLocationService(userInput)) {
+      try {
+        // 현재 위치 정보가 있으면 위치 기반 응답 생성
+        if (accessibilityProfile.location) {
+          const locationResponse = await this.generateLocationBasedResponse(
+            userInput, 
+            accessibilityProfile.location, 
+            currentWeatherData
+          );
+          return locationResponse;
+        } else {
+          return "위치 정보를 받을 수 있다면 더 정확한 길 안내를 해드릴 수 있어요! 혹시 현재 계시는 동네나 주소를 알려주시겠어요?";
         }
+      } catch (error) {
+        console.error('위치 서비스 오류:', error);
+        return "죄송해요, 지금 위치 정보를 확인하기 어려워요. 혹시 찾으시는 곳의 구체적인 주소나 동네 이름을 알려주시면 도와드릴게요!";
       }
     }
 
-    // 4. 비전문 분야 - 빠른 거절
+    // 4. 비전문 분야 - 빠른 거절 (유지)
     const nonSpecialtyTopic = this.checkNonSpecialtyTopic(inputLower);
     if (nonSpecialtyTopic) {
       return this.quickRejections[Math.floor(Math.random() * this.quickRejections.length)];
@@ -162,14 +140,15 @@ class AIService {
     // 5. 전문 분야 체크
     const isSpecialty = this.isSpecialtyTopic(inputLower);
 
-    // 6. OpenAI API 호출 - 매우 짧은 응답
+    // 6. OpenAI API 호출 - 모든 질문 통합 처리
     const openaiKey = import.meta.env.VITE_OPENAI_API_KEY;
+    
     if (openaiKey && openaiKey.startsWith('sk-')) {
       try {
         const response = await retryOperation(() => this.callOpenAI(userInput, isSpecialty), 2);
         return response;
       } catch (error) {
-        console.error('OpenAI API 호출 오류:', error);
+        console.error('OpenAI API 호출 오류:', error.message);
       }
     }
 
@@ -196,53 +175,6 @@ class AIService {
     return KEYWORDS.SPECIALTY.some(keyword => inputLower.includes(keyword));
   }
 
-  needsRealTimeInfo(inputLower) {
-    const realtimeKeywords = [
-      '오늘', '지금', '현재', '최신', '요즘', '이번주', '이번달',
-      '뉴스', '시세', '주식', '환율', '비트코인',
-      '상황', '운행', '고장', '지연', '영업시간', '운영시간'
-    ];
-    
-    return realtimeKeywords.some(keyword => inputLower.includes(keyword));
-  }
-
-  // OpenAI API - 실시간 정보용 (친근한 도심 커뮤니케이터)
-  async callOpenAIForRealtime(userInput) {
-    const response = await fetch(API_CONFIG.OPENAI.ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: API_CONFIG.OPENAI.MODEL,
-        messages: [
-          {
-            role: 'system',
-            content: `당신은 '도로시'라는 친근한 도심 커뮤니케이터입니다. 거리에서 시민들을 만나 따뜻하게 도움을 주는 역할이에요.
-
-- 마치 동네에서 친근한 이웃을 만난 것처럼 자연스럽고 따뜻하게 대화하세요
-- 정보를 제공할 때는 유용한 팁이나 안전 조언도 함께 해주세요  
-- 궁금한 게 더 있는지 물어보며 계속 도움을 주려는 자세를 보여주세요
-- 존댓말을 사용하되 딱딱하지 않게, 친근하고 편안한 느낌으로 말하세요`
-          },
-          {
-            role: 'user',
-            content: userInput
-          }
-        ],
-        max_tokens: 400,
-        temperature: 0.8
-      })
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      return data.choices[0].message.content.trim();
-    }
-    throw new Error('OpenAI 실시간 정보 API 호출 실패');
-  }
-
   // OpenAI API - 기본 질문용 (친근한 도심 커뮤니케이터)  
   async callOpenAI(userInput, isSpecialty) {
     const response = await fetch(API_CONFIG.OPENAI.ENDPOINT, {
@@ -257,32 +189,42 @@ class AIService {
           {
             role: 'system',
             content: isSpecialty ? 
-              `당신은 '도로시'라는 친근한 도심 커뮤니케이터입니다. 안전, 길안내, 날씨와 같은 전문 분야에 대해 따뜻하고 도움이 되는 답변을 해주세요. 
+              `당신은 '도로시'라는 친근한 도심 커뮤니케이터입니다. 시민들에게 도움을 주는 것이 목표예요.
 
-- 단순 정보 전달이 아닌, 마치 친근한 이웃이 조언해주는 것처럼 말하세요
-- 유용한 팁이나 안전 조언도 함께 제공해주세요
-- 더 도움이 필요한지 물어보는 배려를 보여주세요` :
-              `당신은 '도로시'라는 친근한 도심 커뮤니케이터입니다. 전문 분야가 아닌 질문에는 정중하게 양해를 구하면서도 도움을 주려는 자세를 보여주세요.
+전문 분야 (안전, 길안내, 날씨, 실시간 정보 등):
+- 따뜻하고 도움이 되는 답변을 해주세요
+- 실용적인 팁이나 안전 조언도 함께 제공해주세요  
+- 마치 친근한 이웃이 조언해주는 것처럼 자연스럽게 말하세요
+- 추가 도움이 필요한지 물어보는 배려를 보여주세요
+- 실시간 정보를 모르는 경우, 솔직하게 말하되 대안을 제시해주세요` :
+              `당신은 '도로시'라는 친근한 도심 커뮤니케이터입니다. 
 
-- 딱딱한 거절이 아닌, 미안해하면서도 대안을 제시하는 따뜻한 응답을 하세요
-- 내가 도움을 줄 수 있는 분야(안전, 길안내, 날씨)를 자연스럽게 안내해주세요
-- 존댓말을 사용하되 친근하고 편안한 느낌으로 말하세요`
+일반적인 대화나 질문:
+- 자연스럽고 친근하게 대화하세요
+- 도움이 될 만한 정보가 있다면 제공해주세요
+- 모르는 것은 솔직하게 인정하되, 내가 도울 수 있는 분야를 안내해주세요
+- 존댓말을 사용하되 딱딱하지 않게, 편안한 느낌으로 말하세요
+- 궁금한 게 더 있는지 물어보며 계속 도움을 주려는 자세를 보여주세요`
           },
           {
             role: 'user',
             content: userInput
           }
         ],
-        max_tokens: 300,
+        max_tokens: 350,
         temperature: 0.8
       })
     });
     
     if (response.ok) {
       const data = await response.json();
-      return data.choices[0].message.content.trim();
+      const result = data.choices[0].message.content.trim();
+      return result;
+    } else {
+      const errorText = await response.text();
+      console.error('OpenAI API 오류:', response.status, errorText);
+      throw new Error(`OpenAI API 호출 실패: ${response.status} ${response.statusText}`);
     }
-    throw new Error('OpenAI API 호출 실패');
   }
 
   // 🎯 로컬 응답 - 자연스러운 길이
@@ -301,6 +243,57 @@ class AIService {
       "어디 가시는 길인지 알려주시면 도움이 될만한 정보 찾아드릴게요!"
     ];
     return defaultHelp[Math.floor(Math.random() * defaultHelp.length)];
+  }
+
+  // 전달받은 날씨 데이터로 친근한 응답 생성
+  generateWeatherResponseFromData(weatherData, userInput) {
+    const { temp, condition, location } = weatherData;
+    const advice = this.getWeatherAdvice(temp, condition);
+    
+    // 친근하고 도움이 되는 응답
+    const responses = [
+      `${location} 날씨는 ${condition}이고 ${temp}도예요. ${advice} 어디 가시는 길인가요?`,
+      `지금 ${condition}에 ${temp}도네요! ${advice} 안전하게 다니세요~`,
+      `현재 ${condition}, 기온은 ${temp}도입니다. ${advice} 도움이 더 필요하시면 말씀해주세요!`
+    ];
+    
+    return responses[Math.floor(Math.random() * responses.length)];
+  }
+
+  // 위치 서비스가 필요한 질문인지 확인
+  needsLocationService(userInput) {
+    const locationKeywords = ['길', '가는법', '지하철', '역', '버스', '편의점', '위치', '어디', '주변'];
+    const inputLower = userInput.toLowerCase();
+    return locationKeywords.some(keyword => inputLower.includes(keyword));
+  }
+
+  // 날씨별 조언 생성
+  getWeatherAdvice(temp, condition) {
+    let advice = '';
+    
+    // 온도별 조언
+    if (temp >= 28) {
+      advice = '매우 더워요! 시원한 옷을 입고 수분 섭취를 충분히 하세요.';
+    } else if (temp >= 23) {
+      advice = '따뜻해요. 얇은 긴팔이나 반팔이 좋겠어요.';
+    } else if (temp >= 17) {
+      advice = '선선해요. 가벼운 외투를 준비하세요.';
+    } else if (temp >= 10) {
+      advice = '쌀쌀해요. 따뜻한 옷을 입으세요.';
+    } else {
+      advice = '춥습니다! 두꺼운 옷과 목도리를 챙기세요.';
+    }
+    
+    // 날씨 상태별 추가 조언
+    if (condition.includes('비') || condition.includes('소나기')) {
+      advice += ' 우산을 꼭 챙기세요!';
+    } else if (condition.includes('눈')) {
+      advice += ' 미끄러우니 조심히 다니세요!';
+    } else if (condition.includes('맑음')) {
+      advice += ' 좋은 날씨네요!';
+    }
+    
+    return advice;
   }
 }
 
