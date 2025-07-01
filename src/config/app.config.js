@@ -98,45 +98,20 @@ export const APP_CONFIG = {
   }
 };
 
-// 환경 변수 검증
+// 환경 변수 검증 (간소화)
 export const validateEnvironment = () => {
   const required = [
     'VITE_OPENAI_API_KEY',
-    'VITE_PERPLEXITY_API_KEY', 
-    'VITE_WEATHER_API_KEY',
     'VITE_KAKAO_API_KEY'
   ];
   
   const missing = required.filter(key => !import.meta.env[key]);
   
   if (missing.length > 0) {
-    console.warn('⚠️ 누락된 환경 변수:', missing);
+    console.warn('⚠️ 누락된 필수 환경 변수:', missing);
     return false;
   }
   
-  console.log('✅ 모든 환경 변수 설정 완료');
+  console.log('✅ 필수 환경 변수 설정 완료');
   return true;
-};
-
-// API 키 검증
-export const validateApiKeys = () => {
-  const patterns = {
-    VITE_OPENAI_API_KEY: /^sk-[a-zA-Z0-9-]{40,}$/,
-    VITE_PERPLEXITY_API_KEY: /^pplx-[a-zA-Z0-9]{32,}$/,
-    VITE_WEATHER_API_KEY: /^[a-zA-Z0-9]{16,}$/,
-    VITE_KAKAO_API_KEY: /^[a-zA-Z0-9]{32}$/
-  };
-  
-  const results = {};
-  
-  Object.entries(patterns).forEach(([key, pattern]) => {
-    const value = import.meta.env[key];
-    results[key] = {
-      exists: !!value,
-      valid: value ? pattern.test(value) : false,
-      masked: value ? `${value.slice(0, 8)}...${value.slice(-4)}` : 'N/A'
-    };
-  });
-  
-  return results;
 };
