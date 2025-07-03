@@ -106,8 +106,8 @@ src/
 ```
 
 *"기술로 사람과 사람을 연결하는 따뜻한 서비스"* - 도로시 팀
-김대희(PM)
-홍승완(Backend/CV)
-최예희(AI/CV)
-이동건(AI/UX)
-백하림(Frontend/UX)
+- 김대희(PM)
+- 홍승완(Backend/CV)
+- 최예희(AI/CV)
+- 이동건(AI/UX)
+- 백하림(Frontend/UX)
