@@ -110,3 +110,4 @@ src/
 홍승완(Backend/CV)
 최예희(AI/CV)
 이동건(AI/UX)
+백하림(Frontend/UX)
