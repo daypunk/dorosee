@@ -12,10 +12,8 @@ function PWADetail() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 로컬 개발환경에서는 프록시 사용, 배포환경에서는 직접 호출
-        const baseUrl = window.location.hostname === 'localhost' 
-          ? '/api/lcm/findChildList.do'
-          : 'https://www.safe182.go.kr/api/lcm/findChildList.do';
+        // 로컬과 배포 모두 프록시 사용 (CORS 문제 해결)
+        const baseUrl = '/api/lcm/findChildList.do';
         
         // URL 파라미터 생성
         const params = new URLSearchParams({

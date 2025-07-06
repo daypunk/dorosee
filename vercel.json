@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/api/lcm/:path*",
+      "destination": "https://www.safe182.go.kr/api/lcm/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
