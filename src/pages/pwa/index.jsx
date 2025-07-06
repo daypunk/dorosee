@@ -148,6 +148,7 @@ function PWAIndex() {
                           src={photo}
                           alt={`${name} 사진`}
                           className="w-18 h-22 object-cover rounded-md border border-gray-300"
+                          style={{ filter: 'blur(1.5px)' }}
                           onError={(e) => (e.target.style.display = 'none')}
                         />
                       ) : (
@@ -197,12 +198,7 @@ function PWAIndex() {
                         <div className="w-2.5 h-2.5 bg-orange-500 rounded-full"></div>
                         <span className="text-xs font-medium text-gray-700">실종 신고</span>
                       </div>
-                      <div className="flex items-center space-x-1">
-                        <span className="text-xs text-gray-500">자세히 보기</span>
-                        <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </div>
+                      <span className="text-xs text-gray-500">자세히 보기</span>
                     </div>
                   </div>
                 </motion.div>

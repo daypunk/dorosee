@@ -76,8 +76,35 @@ class AIService {
 
   async generateResponse(userInput, accessibilityProfile = {}, currentWeatherData = null) {
     const inputLower = userInput.toLowerCase();
+    
+    // ⭐ 최우선: 지정된 특정 질문들 (다른 모든 로직보다 우선)
+    console.log('🔍 질문 체크:', userInput);
+    
+    // 공백과 구두점을 제거한 정규화된 텍스트 생성 (음성 인식 오차 보정)
+    const normalizedInput = userInput.trim().replace(/\s+/g, '').replace(/[?!.,]/g, '');
+    console.log('🔧 정규화된 입력:', normalizedInput);
+    
+    // 1-1. 너는 어떤 서비스야?
+    if (normalizedInput === "너는어떤서비스야" || normalizedInput === "너어떤서비스야" || normalizedInput === "어떤서비스야") {
+      console.log('✅ 매칭: 서비스 소개');
+      return "안녕하세요! 저는 커뮤니케이터 도로시입니다. 날씨나 길찾기 등을 편하게 물어보실 수 있어요.";
+    }
+    
+    // 1-2. 오늘 비올까?
+    if (normalizedInput === "오늘비올까" || normalizedInput === "오늘비와" || normalizedInput === "비올까") {
+      console.log('✅ 매칭: 비 질문');
+      return "오늘 강남구는 비가 안 올 것 같아요~ 이번 주는 비 소식이 없네요? 과연 어떻게 될까요";
+    }
+    
+    // 1-3. 지금 코엑스인데 뭐하고 놀까?
+    if (normalizedInput === "지금코엑스인데뭐하고놀까" || normalizedInput === "코엑스인데뭐하고놀까" || normalizedInput === "코엑스뭐하고놀까") {
+      console.log('✅ 매칭: 코엑스 질문');
+      return "이렇게 더운 날엔 코엑스몰에서 쇼핑이나 별마당도서관에서 책읽기, 어떠신가요?";
+    }
+    
+    console.log('❌ 특정 질문 매칭 안됨, 다음 로직으로...');
 
-    // 1. 이름 질문 - 친근한 자기소개
+    // 2. 이름 질문 - 친근한 자기소개
     if (this.isNameQuestion(inputLower)) {
       const introResponses = [
         "안녕하세요! 저는 도로시예요~ 거리에서 시민분들에게 길 안내하고 안전 정보 알려드리는 일을 하고 있어요! 혹시 어디 가시는 길인가요?",
@@ -87,7 +114,7 @@ class AIService {
       return introResponses[Math.floor(Math.random() * introResponses.length)];
     }
 
-    // 2. 날씨 질문 - 현재 데이터 우선 사용
+    // 3. 날씨 질문 - 현재 데이터 우선 사용
     if (accessibilityWeatherService.isWeatherQuery(userInput)) {
       try {
         // 전달받은 현재 날씨 데이터가 있으면 우선 사용
@@ -104,7 +131,7 @@ class AIService {
       }
     }
 
-    // 3. 위치 서비스 - 편의점, 길찾기 등
+    // 4. 위치 서비스 - 편의점, 길찾기 등
     if (this.needsLocationService(userInput)) {
       try {
         // 특정 목적지 길찾기 (코엑스, 강남역 등)
@@ -130,13 +157,13 @@ class AIService {
       }
     }
 
-    // 4. 매우 전문적인 분야만 빠른 거절 (대폭 축소)
+    // 5. 매우 전문적인 분야만 빠른 거절 (대폭 축소)
     const nonSpecialtyTopic = this.checkNonSpecialtyTopic(inputLower);
     if (nonSpecialtyTopic) {
       return this.quickRejections[Math.floor(Math.random() * this.quickRejections.length)];
     }
 
-    // 5. OpenAI API 호출 - 모든 질문 통합 처리
+    // 6. OpenAI API 호출 - 모든 질문 통합 처리
     const openaiKey = import.meta.env.VITE_OPENAI_API_KEY;
     
     if (openaiKey && openaiKey.startsWith('sk-')) {
@@ -148,7 +175,7 @@ class AIService {
       }
     }
 
-    // 6. 로컬 응답
+    // 7. 로컬 응답
     return this.getLocalResponse(inputLower);
   }
 

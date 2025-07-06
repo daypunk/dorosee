@@ -135,6 +135,7 @@ function PWADetail() {
                     src={photo}
                     alt="실종자 사진"
                     className="w-18 h-22 object-cover rounded-md border border-gray-300"
+                    style={{ filter: 'blur(1.5px)' }}
                     onError={(e) => (e.target.style.display = 'none')}
                   />
                 ) : (
@@ -183,63 +184,61 @@ function PWADetail() {
                 <div className="w-2.5 h-2.5 bg-orange-500 rounded-full"></div>
                 <h2 className="text-lg font-bold text-gray-900">제보내용</h2>
               </div>
-              <p className="text-gray-600 text-xs mb-4">상세히 기입해 주시면 실종자를 더 빨리 찾을 수 있습니다.</p>
+              <p className="text-gray-600 text-sm mb-4">상세히 기입해 주시면 실종자를 더 빨리 찾을 수 있습니다.</p>
 
               <div className="space-y-4">
                 {/* 목격 장소 */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">목격 장소</label>
-                  <input 
-                    type="text" 
-                    placeholder="목격한 구체적인 장소를 입력하세요" 
-                    required 
-                    className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
-                  />
+                  <label className="block text-xs font-medium text-gray-500 mb-2">목격 장소</label>
+                                      <input 
+                      type="text" 
+                      placeholder="목격한 구체적인 장소를 입력하세요" 
+                      required 
+                      className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-400 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
+                    />
                 </div>
 
                 {/* 목격 시간 - 날짜와 시간 분리 */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">목격 시간</label>
+                  <label className="block text-xs font-medium text-gray-500 mb-2">목격 시간</label>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <input 
                         type="date" 
                         required 
-                        className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
+                        className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
                       />
-                      <div className="text-xs text-gray-500 mt-1">날짜</div>
                     </div>
                     <div>
                       <input 
                         type="time" 
                         required 
-                        className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
+                        className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
                       />
-                      <div className="text-xs text-gray-500 mt-1">시간</div>
                     </div>
                   </div>
                 </div>
 
                 {/* 인상착의 */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">인상착의</label>
-                  <input 
-                    type="text" 
-                    placeholder="옷차림, 특징 등을 입력하세요" 
-                    required 
-                    className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
-                  />
+                  <label className="block text-xs font-medium text-gray-500 mb-2">인상착의</label>
+                                      <input 
+                      type="text" 
+                      placeholder="옷차림, 특징 등을 입력하세요" 
+                      required 
+                      className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-400 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
+                    />
                 </div>
 
                 {/* 기타 특이사항 */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">기타 특이사항</label>
-                  <textarea 
-                    placeholder="함께 있던 사람, 상황, 행동 등 추가 정보를 입력하세요" 
-                    required 
-                    rows="3"
-                    className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none text-xs"
-                  />
+                  <label className="block text-xs font-medium text-gray-500 mb-2">기타 특이사항</label>
+                                      <textarea 
+                      placeholder="함께 있던 사람, 상황, 행동 등 추가 정보를 입력하세요" 
+                      required 
+                      rows="3"
+                      className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-400 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none text-xs"
+                    />
                 </div>
                 
                 {/* 제보하기 버튼 */}

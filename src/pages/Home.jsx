@@ -150,11 +150,12 @@ function Home() {
 
   const handleSendMessage = async (message) => {
     clearInactivityTimer() // 도로시가 응답하는 동안 타이머 정지
+    
     const response = await sendMessage(message)
     if (response) {
-      await speakText(response)
+      await speakText(response) // TTS 완료까지 대기
     }
-    // 도로시 응답 완료 후 6초 타이머 시작
+    // TTS 완료 후 8초 타이머 시작
     resetInactivityTimer()
   }
 
