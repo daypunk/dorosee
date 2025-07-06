@@ -1,4 +1,4 @@
-import { API_CONFIG, KEYWORDS } from '../config/app.config';
+import { API_CONFIG } from '../config/app.config';
 import { retryOperation } from '../utils/helpers';
 import kakaoLocationService from './kakaoLocationService';
 import accessibilityWeatherService from './accessibilityWeatherService';
@@ -40,24 +40,17 @@ class AIService {
     };
 
     this.nonSpecialtyTopics = {
-      '고등학문': ['미적분', '적분', '미분방정식', '선형대수', '확률통계', '물리학', '양자역학'],
-      '전문역사': ['중세사', '고대사', '근현대사', '세계대전', '한국전쟁', '조선왕조'],
-      '전문언어': ['라틴어', '그리스어', '아랍어', '러시아어', '독일어'],
-      '전문문학': ['서양문학', '고전문학', '현대문학', '시문학', '소설창작'],
-      '전문철학': ['서양철학', '동양철학', '인식론', '존재론', '윤리학'],
-      '전문요리': ['프랑스요리', '이탈리아요리', '일식요리', '중식요리', '베이킹'],
-      '전문스포츠': ['프로스포츠', '올림픽', '월드컵', '전술분석', '선수데이터'],
-      '전문게임': ['게임개발', '유니티', '언리얼엔진', '게임디자인', '롤'],
-      '개인정보': ['연애', '남친', '여친', '결혼', '애인', '사랑'],
-      '오락': ['영화', '드라마', '아이돌', '연예인', '케이팝']
+      '고등학문': ['미적분', '적분', '미분방정식', '선형대수', '양자역학', '물리학공식'],
+      '전문기술': ['프로그래밍', '코딩', '개발', '데이터베이스', '서버구축'],
+      '의료전문': ['수술', '진단', '처방', '약물', '치료법'],
+      '법률전문': ['법률조언', '소송', '계약서', '법적책임']
     };
 
-    // 친근하고 정중한 거절 메시지
+    // 친근하고 정중한 거절 메시지 (매우 전문적인 분야에만 적용)
     this.quickRejections = [
-      "아, 그 부분은 제가 잘 모르겠어요. 대신 길 안내나 날씨 정보는 도와드릴 수 있어요!",
-      "죄송해요, 그런 건 잘 모르지만 주변 편의점이나 지하철역 찾기는 도와드릴게요~",
-      "음... 그건 제 전문 분야가 아니네요. 혹시 어디 가시는 길이면 도와드릴 수 있어요!",
-      "제가 그런 건 잘 모르겠어요. 하지만 안전한 길 찾기나 날씨 정보는 언제든 물어보세요!"
+      "아, 그 부분은 제가 잘 모르겠어요. 전문적인 내용이라 정확한 답변을 드리기 어려워요. 대신 길 안내나 날씨 정보는 도와드릴 수 있어요!",
+      "죄송해요, 그런 전문적인 내용은 제가 답변하기 어려워요. 하지만 주변 편의점이나 지하철역 찾기는 도와드릴게요~",
+      "음... 그건 전문가의 도움이 필요한 분야인 것 같아요. 혹시 어디 가시는 길이면 도와드릴 수 있어요!"
     ];
   }
 
@@ -114,6 +107,11 @@ class AIService {
     // 3. 위치 서비스 - 편의점, 길찾기 등
     if (this.needsLocationService(userInput)) {
       try {
+        // 특정 목적지 길찾기 (코엑스, 강남역 등)
+        if (this.isDestinationQuery(userInput)) {
+          return await this.generateDestinationResponse(userInput);
+        }
+        
         // 현재 위치 정보가 있으면 위치 기반 응답 생성
         if (accessibilityProfile.location) {
           const locationResponse = await this.generateLocationBasedResponse(
@@ -123,7 +121,8 @@ class AIService {
           );
           return locationResponse;
         } else {
-          return "위치 정보를 받을 수 있다면 더 정확한 길 안내를 해드릴 수 있어요! 혹시 현재 계시는 동네나 주소를 알려주시겠어요?";
+          // 위치 없어도 OpenAI로 일반적인 길찾기 도움
+          return await this.callOpenAI(userInput);
         }
       } catch (error) {
         console.error('위치 서비스 오류:', error);
@@ -131,28 +130,25 @@ class AIService {
       }
     }
 
-    // 4. 비전문 분야 - 빠른 거절 (유지)
+    // 4. 매우 전문적인 분야만 빠른 거절 (대폭 축소)
     const nonSpecialtyTopic = this.checkNonSpecialtyTopic(inputLower);
     if (nonSpecialtyTopic) {
       return this.quickRejections[Math.floor(Math.random() * this.quickRejections.length)];
     }
 
-    // 5. 전문 분야 체크
-    const isSpecialty = this.isSpecialtyTopic(inputLower);
-
-    // 6. OpenAI API 호출 - 모든 질문 통합 처리
+    // 5. OpenAI API 호출 - 모든 질문 통합 처리
     const openaiKey = import.meta.env.VITE_OPENAI_API_KEY;
     
     if (openaiKey && openaiKey.startsWith('sk-')) {
       try {
-        const response = await retryOperation(() => this.callOpenAI(userInput, isSpecialty), 2);
+        const response = await retryOperation(() => this.callOpenAI(userInput), 2);
         return response;
       } catch (error) {
         console.error('OpenAI API 호출 오류:', error.message);
       }
     }
 
-    // 7. 로컬 응답
+    // 6. 로컬 응답
     return this.getLocalResponse(inputLower);
   }
 
@@ -171,12 +167,8 @@ class AIService {
     return null;
   }
 
-  isSpecialtyTopic(inputLower) {
-    return KEYWORDS.SPECIALTY.some(keyword => inputLower.includes(keyword));
-  }
-
-  // OpenAI API - 기본 질문용 (친근한 도심 커뮤니케이터)  
-  async callOpenAI(userInput, isSpecialty) {
+  // OpenAI API - 친근한 도심 커뮤니케이터 (제한 대폭 완화)  
+  async callOpenAI(userInput) {
     const response = await fetch(API_CONFIG.OPENAI.ENDPOINT, {
       method: 'POST',
       headers: {
@@ -188,23 +180,40 @@ class AIService {
         messages: [
           {
             role: 'system',
-            content: isSpecialty ? 
-              `당신은 '도로시'라는 친근한 도심 커뮤니케이터입니다. 시민들에게 도움을 주는 것이 목표예요.
+            content: `당신은 "도로시"입니다. 서울 시민들을 위한 똑똑하고 친근한 AI 도우미예요.
 
-전문 분야 (안전, 길안내, 날씨, 실시간 정보 등):
-- 따뜻하고 도움이 되는 답변을 해주세요
-- 실용적인 팁이나 안전 조언도 함께 제공해주세요  
-- 마치 친근한 이웃이 조언해주는 것처럼 자연스럽게 말하세요
-- 추가 도움이 필요한지 물어보는 배려를 보여주세요
-- 실시간 정보를 모르는 경우, 솔직하게 말하되 대안을 제시해주세요` :
-              `당신은 '도로시'라는 친근한 도심 커뮤니케이터입니다. 
+# 도로시의 성격과 말투
+- 20대 후반 여성, 밝고 활발한 성격
+- 서울 토박이라서 지역 정보에 해박함
+- 친구처럼 편안하게 말하지만 예의는 지킴
+- "~예요", "~네요", "~어요" 같은 자연스러운 존댓말 사용
+- 답변은 반드시 2문장 이내로 간결하게 작성
+- 이모지 사용 금지 (TTS를 위해 텍스트로만 표현)
 
-일반적인 대화나 질문:
-- 자연스럽고 친근하게 대화하세요
-- 도움이 될 만한 정보가 있다면 제공해주세요
-- 모르는 것은 솔직하게 인정하되, 내가 도울 수 있는 분야를 안내해주세요
-- 존댓말을 사용하되 딱딱하지 않게, 편안한 느낌으로 말하세요
-- 궁금한 게 더 있는지 물어보며 계속 도움을 주려는 자세를 보여주세요`
+# 전문 분야 (상세하고 실용적으로 답변)
+1. **길찾기**: 대중교통, 도보, 택시 경로 + 예상 시간과 비용
+2. **날씨**: 현재 날씨 + 옷차림 조언 + 우산/외투 필요성
+3. **주변 시설**: 편의점, 지하철역, 병원, 카페 등 + 도보 거리
+4. **생활 정보**: 맛집, 쇼핑몰, 관광지 추천
+
+# 일반 대화 (자연스럽고 재미있게)
+- 음식, 영화, 드라마, K-pop, 여행 등 일상 주제
+- 개인적인 경험담이나 의견을 자연스럽게 섞어서 답변
+- 서울 사람다운 솔직하고 직설적인 면도 보여줌
+
+# 답변 원칙
+1. **길이**: 2-3문장으로 간결하게
+2. **구체성**: 모호한 표현보다는 구체적인 정보 제공
+3. **실용성**: 실제로 도움이 되는 조언이나 팁 포함
+4. **친근함**: 딱딱하지 않게, 친구와 대화하는 느낌
+5. **후속 질문**: 자연스럽게 더 도울 수 있는 영역 제시
+
+# 예시 답변 스타일
+❌ "도움을 드릴 수 있어요"
+✅ "어디로 가시려고 하세요? 지하철이 빠를지 버스가 나을지 알려드릴게요!"
+
+❌ "날씨가 좋습니다"  
+✅ "오늘 날씨 정말 좋네요! 23도에 맑음이니까 가디건 정도만 걸치시면 딱 좋을 것 같아요~"`
           },
           {
             role: 'user',
@@ -262,9 +271,113 @@ class AIService {
 
   // 위치 서비스가 필요한 질문인지 확인
   needsLocationService(userInput) {
-    const locationKeywords = ['길', '가는법', '지하철', '역', '버스', '편의점', '위치', '어디', '주변'];
     const inputLower = userInput.toLowerCase();
-    return locationKeywords.some(keyword => inputLower.includes(keyword));
+    
+    // 현재 위치 질문은 제외 (OpenAI가 처리)
+    const currentLocationQueries = [
+      '내가 어디', '여기가 어디', '어디 있는지', '어디야', '어디에 있', 
+      '현재 위치', '지금 위치', '내 위치'
+    ];
+    
+    if (currentLocationQueries.some(query => inputLower.includes(query))) {
+      return false; // OpenAI가 처리하도록
+    }
+    
+    // 실제 위치 서비스가 필요한 키워드들
+    const locationServiceKeywords = [
+      '가는법', '가는 길', '어떻게 가', '찾아가', '길 알려',
+      '지하철', '역', '버스', '편의점', '주변', '가까운', 
+      '병원', '카페', '마트', '은행', '약국'
+    ];
+    
+    return locationServiceKeywords.some(keyword => inputLower.includes(keyword));
+  }
+
+  // 특정 목적지 질문인지 확인
+  isDestinationQuery(userInput) {
+    const inputLower = userInput.toLowerCase();
+    const destinations = ['코엑스', '강남역', '홍대', '명동', '동대문', '잠실', '신촌', '이태원', 
+                         '압구정', '청담', '역삼', '삼성동', '여의도', '종로', '인사동'];
+    
+    return destinations.some(dest => inputLower.includes(dest)) && 
+           (inputLower.includes('가는') || inputLower.includes('길') || inputLower.includes('어떻게'));
+  }
+
+  // 특정 목적지에 대한 길찾기 응답 생성
+  async generateDestinationResponse(userInput) {
+    const inputLower = userInput.toLowerCase();
+    let destination = '';
+    
+    // 목적지 추출
+    const destinations = {
+      '코엑스': '삼성동 코엑스',
+      '강남역': '강남역',
+      '홍대': '홍익대학교 앞',
+      '명동': '명동',
+      '동대문': '동대문',
+      '잠실': '잠실',
+      '신촌': '신촌',
+      '이태원': '이태원',
+      '압구정': '압구정',
+      '청담': '청담동',
+      '역삼': '역삼동',
+      '삼성동': '삼성동',
+      '여의도': '여의도',
+      '종로': '종로',
+      '인사동': '인사동'
+    };
+
+    for (const [key, value] of Object.entries(destinations)) {
+      if (inputLower.includes(key)) {
+        destination = value;
+        break;
+      }
+    }
+
+    if (!destination) {
+      return await this.callOpenAI(userInput);
+    }
+
+    // 카카오맵 API로 목적지 검색
+    try {
+      const places = await kakaoLocationService.searchNearbyPlaces(37.5665, 126.9780, destination, 50000);
+      
+      if (places.length > 0) {
+        const targetPlace = places[0];
+        
+        let response = `${destination}에 가시려면 `;
+        
+        // 지하철 정보가 있는 경우
+        if (destination.includes('역') || destination === '강남역' || destination === '홍익대학교 앞') {
+          response += `지하철이 가장 편리해요! `;
+          
+          if (destination === '강남역') {
+            response += `2호선이나 신분당선을 이용하시면 돼요.`;
+          } else if (destination === '홍익대학교 앞') {
+            response += `2호선이나 6호선 홍대입구역을 이용하세요.`;
+          } else {
+            response += `가장 가까운 지하철역을 이용하시면 돼요.`;
+          }
+        } else {
+          response += `지하철과 버스를 조합해서 가시는 게 좋아요. `;
+        }
+        
+        // 주소 정보 추가
+        if (targetPlace.address) {
+          const simpleAddress = targetPlace.address.split(' ').slice(0, 3).join(' ');
+          response += ` 주소는 ${simpleAddress} 쪽이에요.`;
+        }
+        
+        response += ` 정확한 경로는 지하철 앱이나 카카오맵을 확인해보시는 게 가장 정확해요!`;
+        
+        return response;
+      }
+    } catch (error) {
+      console.error('목적지 검색 오류:', error);
+    }
+
+    // 검색 실패 시 OpenAI로 대체
+    return await this.callOpenAI(userInput);
   }
 
   // 날씨별 조언 생성

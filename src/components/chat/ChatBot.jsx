@@ -114,7 +114,33 @@ const ChatBot = ({ isOpen, onClose }) => {
   }, [location]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // column-reverse에서는 스크롤을 맨 위로 보내야 최신 메시지가 보임
+    const scrollToLatestMessage = () => {
+      const container = document.querySelector('.messages-container');
+      if (container) {
+        // column-reverse에서는 scrollTop을 0으로 설정
+        container.scrollTop = 0;
+      }
+      
+      // messagesEndRef도 사용 (더블 보장)
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ 
+          behavior: 'auto',
+          block: 'start' // column-reverse에서는 start로 설정
+        });
+      }
+    };
+    
+    // 즉시 실행
+    scrollToLatestMessage();
+    
+    // React 렌더링 완료 후 한 번 더
+    requestAnimationFrame(() => {
+      scrollToLatestMessage();
+    });
+    
+    // 추가 보험
+    setTimeout(scrollToLatestMessage, 50);
   };
 
   // 사용자 메시지 처리
@@ -131,6 +157,7 @@ const ChatBot = ({ isOpen, onClose }) => {
     
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
+    scrollToBottom();
 
     // 응급상황 감지
     if (detectEmergency(text)) {
@@ -147,6 +174,7 @@ const ChatBot = ({ isOpen, onClose }) => {
       setMessages(prev => [...prev, botMessage]);
       setShowEmergency(true);
       speakText(emergencyResponse);
+      scrollToBottom();
       return;
     }
 
@@ -166,6 +194,7 @@ const ChatBot = ({ isOpen, onClose }) => {
       
       // 모든 응답에 대해 TTS 실행 (사용자가 TTS 모드를 선택한 경우)
       speakText(response);
+      scrollToBottom();
     } catch (error) {
       console.error('응답 생성 오류:', error);
       const errorMessage = {
@@ -176,6 +205,7 @@ const ChatBot = ({ isOpen, onClose }) => {
         isEmergency: false
       };
       setMessages(prev => [...prev, errorMessage]);
+      scrollToBottom();
     }
   };
 
@@ -210,7 +240,7 @@ const ChatBot = ({ isOpen, onClose }) => {
           onClick={onClose}
         >
         <motion.div 
-          className="bg-slate-800 rounded-2xl w-full max-w-md h-[600px] flex flex-col overflow-hidden"
+          className="bg-slate-800 rounded-2xl w-full max-w-md h-[600px] flex flex-col overflow-hidden relative"
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.8, opacity: 0 }}
@@ -275,98 +305,114 @@ const ChatBot = ({ isOpen, onClose }) => {
           </div>
 
           {/* 메시지 영역 */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div className={`max-w-[80%] rounded-2xl px-4 py-2 ${
-                  message.sender === 'user' 
-                    ? 'bg-blue-600 text-white' 
-                    : message.isEmergency 
-                      ? 'bg-red-600 text-white' 
-                      : 'bg-slate-600 text-white'
-                }`}>
-                  <p className="text-sm">{message.text}</p>
-                  <p className="text-xs opacity-70 mt-1">
-                    {message.sender === 'bot' ? '도로시' : '시민'} • {message.timestamp}
-                  </p>
+          <div 
+            className="messages-container" 
+            style={{ 
+              display: 'flex', 
+              flexDirection: 'column-reverse',
+              overflowY: 'auto',
+              padding: '16px',
+              height: 'calc(600px - 180px)', // 헤더(80px) + 입력영역(100px) 제외
+              backgroundColor: 'transparent'
+            }}
+          >
+            <div>
+              <div ref={messagesEndRef} />
+              {/* 메시지를 역순으로 렌더링 */}
+              {[...messages].reverse().map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} mb-4`}
+                >
+                  <div className={`max-w-[80%] rounded-2xl px-4 py-2 ${
+                    message.sender === 'user' 
+                      ? 'bg-blue-600 text-white' 
+                      : message.isEmergency 
+                        ? 'bg-red-600 text-white' 
+                        : 'bg-slate-600 text-white'
+                  }`}>
+                    <p className="text-sm">{message.text}</p>
+                    <p className="text-xs opacity-70 mt-1">
+                      {message.sender === 'bot' ? '도로시' : '시민'} • {message.timestamp}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* 빠른 액션 버튼들 */}
-          <div className="px-4 py-2 border-t border-slate-600">
-            <div className="flex space-x-2 overflow-x-auto pb-2">
-              <button 
-                onClick={() => handleQuickAction('현재 날씨 알려줘')}
-                className="px-3 py-1 bg-slate-600 text-white rounded-full text-sm whitespace-nowrap hover:bg-slate-500 transition-colors"
-              >
-                날씨
-              </button>
-              <button 
-                onClick={() => handleQuickAction('지하철역 가는 길 알려줘')}
-                className="px-3 py-1 bg-slate-600 text-white rounded-full text-sm whitespace-nowrap hover:bg-slate-500 transition-colors"
-              >
-                교통
-              </button>
-              <button 
-                onClick={() => handleQuickAction('주변 병원 찾아줘')}
-                className="px-3 py-1 bg-slate-600 text-white rounded-full text-sm whitespace-nowrap hover:bg-slate-500 transition-colors"
-              >
-                병원
-              </button>
-              <button 
-                onClick={() => speakText(`안녕하세요! 도로시의 ${ttsMode} TTS 테스트입니다. 음성이 잘 들리시나요?`)}
-                className="px-3 py-1 bg-purple-600 text-white rounded-full text-sm whitespace-nowrap hover:bg-purple-500 transition-colors"
-              >
-                TTS 테스트
-              </button>
-              <button 
-                onClick={() => handleQuickAction('도움이 필요해')}
-                className="px-3 py-1 bg-red-600 text-white rounded-full text-sm whitespace-nowrap hover:bg-red-500 transition-colors"
-              >
-                도움
-              </button>
+              ))}
             </div>
           </div>
 
-          {/* 입력 영역 */}
-          <div className="p-4 border-t border-slate-600">
-            <form onSubmit={handleSubmit} className="flex space-x-2">
-              <input
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder="메시지를 입력하세요..."
-                className="flex-1 bg-slate-700 text-white rounded-full px-4 py-2 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {isSupported && (
-                <button
-                  type="button"
-                  onClick={handleVoiceToggle}
-                  className={`p-2 rounded-full transition-colors ${
-                    isListening 
-                      ? 'bg-red-600 text-white' 
-                      : 'bg-slate-600 text-slate-300 hover:bg-slate-500'
-                  }`}
+          {/* 고정된 하단 입력 영역 */}
+          <div className="absolute bottom-0 left-0 right-0 bg-slate-800 rounded-b-2xl z-50 border-t border-slate-600">
+            {/* 빠른 액션 버튼들 */}
+            <div className="px-4 py-2">
+              <div className="flex space-x-2 overflow-x-auto pb-2">
+                <button 
+                  onClick={() => handleQuickAction('현재 날씨 알려줘')}
+                  className="px-3 py-1 bg-slate-600 text-white rounded-full text-sm whitespace-nowrap hover:bg-slate-500 transition-colors"
                 >
-                  🎤
+                  날씨
                 </button>
-              )}
-              <button
-                type="submit"
-                disabled={!inputValue.trim()}
-                className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
-              </button>
-            </form>
+                <button 
+                  onClick={() => handleQuickAction('지하철역 가는 길 알려줘')}
+                  className="px-3 py-1 bg-slate-600 text-white rounded-full text-sm whitespace-nowrap hover:bg-slate-500 transition-colors"
+                >
+                  교통
+                </button>
+                <button 
+                  onClick={() => handleQuickAction('주변 병원 찾아줘')}
+                  className="px-3 py-1 bg-slate-600 text-white rounded-full text-sm whitespace-nowrap hover:bg-slate-500 transition-colors"
+                >
+                  병원
+                </button>
+                <button 
+                  onClick={() => speakText(`안녕하세요! 도로시의 ${ttsMode} TTS 테스트입니다. 음성이 잘 들리시나요?`)}
+                  className="px-3 py-1 bg-purple-600 text-white rounded-full text-sm whitespace-nowrap hover:bg-purple-500 transition-colors"
+                >
+                  TTS 테스트
+                </button>
+                <button 
+                  onClick={() => handleQuickAction('도움이 필요해')}
+                  className="px-3 py-1 bg-red-600 text-white rounded-full text-sm whitespace-nowrap hover:bg-red-500 transition-colors"
+                >
+                  도움
+                </button>
+              </div>
+            </div>
+
+            {/* 입력 영역 */}
+            <div className="p-4">
+              <form onSubmit={handleSubmit} className="flex space-x-2">
+                <input
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder="메시지를 입력하세요..."
+                  className="flex-1 bg-slate-700 text-white rounded-full px-4 py-2 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                {isSupported && (
+                  <button
+                    type="button"
+                    onClick={handleVoiceToggle}
+                    className={`p-2 rounded-full transition-colors ${
+                      isListening 
+                        ? 'bg-red-600 text-white' 
+                        : 'bg-slate-600 text-slate-300 hover:bg-slate-500'
+                    }`}
+                  >
+                    🎤
+                  </button>
+                )}
+                <button
+                  type="submit"
+                  disabled={!inputValue.trim()}
+                  className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                </button>
+              </form>
+            </div>
           </div>
         </motion.div>
       </motion.div>

@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 
 const useAdvancedTTS = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [ttsMode, setTtsMode] = useState('web'); // 'web', 'openai', 'ttsmaker'
+  const [ttsMode, setTtsMode] = useState('openai'); // 'web', 'openai', 'ttsmaker'
   const synthRef = useRef(null);
   const audioRef = useRef(null);
 

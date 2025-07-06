@@ -18,6 +18,7 @@ function Home() {
   
   const recognitionRef = useRef(null)
   const timeoutRef = useRef(null)
+  const chatScrollRef = useRef(null)
   
   const { messages, sendMessage, isLoading, clearMessages } = useChat()
   const { speakText, stopSpeaking, initializeSpeech } = useAdvancedTTS()
@@ -84,6 +85,12 @@ function Home() {
       initializeSpeech()
       // 음성 인식 자동 시작
       startListening()
+      // 채팅 모드 시작 후 스크롤 초기화 (column-reverse)
+      setTimeout(() => {
+        if (chatScrollRef.current) {
+          chatScrollRef.current.scrollTop = 0
+        }
+      }, 500)
       // 타이머는 첫 번째 도로시 응답 완료 후에 시작됨
     } else {
       exitChatMode()
@@ -165,7 +172,7 @@ function Home() {
     clearInactivityTimer()
     timeoutRef.current = setTimeout(() => {
       exitChatMode()
-    }, 6000) // 6초
+    }, 8000) // 8초
   }
 
   const clearInactivityTimer = () => {
@@ -198,6 +205,21 @@ function Home() {
     }
   }, [])
 
+  // 메시지 변경 시 스크롤을 맨 아래로 이동 (column-reverse 사용)
+  useEffect(() => {
+    if (chatScrollRef.current && isChatMode) {
+      const scrollElement = chatScrollRef.current
+      // column-reverse에서는 scrollTop = 0이 최신 메시지 위치
+      const scrollToBottom = () => {
+        scrollElement.scrollTop = 0
+      }
+      
+      // 즉시 실행하고, 애니메이션 완료 후에도 실행
+      scrollToBottom()
+      setTimeout(scrollToBottom, 300)
+    }
+  }, [messages, isLoading, isChatMode])
+
   // 컴포넌트 언마운트 시 정리
   useEffect(() => {
     return () => {
@@ -211,15 +233,10 @@ function Home() {
       {/* 통합 테스터 */}
       <UnifiedTester />
       
-      <div className="h-screen bg-slate-900 flex flex-col justify-between items-center px-6 py-8 overflow-hidden">
-      {/* 빈 공간 */}
-      <div></div>
-      
-      {/* 메인 콘텐츠 */}
-      <div className="flex-1 flex flex-col">
+      <div className="h-screen bg-slate-900 relative overflow-hidden">
         {/* 일반 모드 - 중앙 정렬 */}
         <motion.div 
-          className="flex flex-col items-center justify-center flex-1"
+          className="absolute inset-0 flex flex-col items-center justify-center px-6"
           animate={{ 
             opacity: isChatMode ? 0 : 1,
             pointerEvents: isChatMode ? 'none' : 'auto'
@@ -258,28 +275,55 @@ function Home() {
           </motion.div>
         </motion.div>
 
-        {/* 채팅 모드 */}
+        {/* 채팅 모드 - 절대 위치로 고정 */}
         <motion.div 
-          className="flex-1 px-4 py-6"
+          className="absolute inset-0 px-4 pt-6 pb-32"
           animate={{ 
             opacity: isChatMode ? 1 : 0,
             pointerEvents: isChatMode ? 'auto' : 'none'
           }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
         >
-          <div className="h-full flex flex-col space-y-4 max-w-4xl mx-auto">
-            {/* 채팅 메시지들 */}
-            <div className="flex-1 space-y-4 overflow-y-auto">
-              {messages.length === 0 && (
-                <div className="text-center text-slate-300 text-lg">
-                  안녕하세요! 무엇을 도와드릴까요?
-                </div>
+          <div className="h-full flex flex-col max-w-4xl mx-auto">
+            {/* 채팅 메시지들 - 스크롤 영역 (하단부터 생성) */}
+            <div 
+              ref={chatScrollRef}
+              className="flex-1 flex flex-col-reverse space-y-4 space-y-reverse overflow-y-auto pb-4 hide-scrollbar"
+              style={{ scrollBehavior: 'smooth' }}
+            >
+              {/* 로딩 표시 (가장 아래 = 가장 최신) */}
+              {isLoading && (
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex justify-start items-start space-x-4"
+                >
+                  {/* 도로시 애니메이션 */}
+                  <div style={{ width: '60px', height: '60px' }}>
+                    <RiveComponent 
+                      style={{ 
+                        width: '100%', 
+                        height: '100%',
+                        imageRendering: 'auto',
+                      }}
+                    />
+                  </div>
+                  
+                  <div className="bg-white rounded-2xl px-4 py-3 shadow-lg">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                      <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                    </div>
+                  </div>
+                </motion.div>
               )}
               
-              {messages.map((message, index) => (
+              {/* 메시지들을 역순으로 렌더링 (최신이 아래) */}
+              {messages.slice().reverse().map((message, index) => (
                 <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
+                  key={messages.length - 1 - index}
+                  initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
                   className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start items-start space-x-4'}`}
@@ -315,84 +359,25 @@ function Home() {
                 </motion.div>
               ))}
               
-              {/* 로딩 표시 */}
-              {isLoading && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex justify-start items-start space-x-4"
-                >
-                  {/* 도로시 애니메이션 */}
-                  <div style={{ width: '60px', height: '60px' }}>
-                    <RiveComponent 
-                      style={{ 
-                        width: '100%', 
-                        height: '100%',
-                        imageRendering: 'auto',
-                      }}
-                    />
-                  </div>
-                  
-                  <div className="bg-white rounded-2xl px-4 py-3 shadow-lg">
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                      <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                    </div>
-                  </div>
-                </motion.div>
+              {/* 빈 상태 메시지 (가장 위 = 가장 오래됨) */}
+              {messages.length === 0 && (
+                <div className="text-center text-slate-300 text-lg pt-8">
+                  안녕하세요! 무엇을 도와드릴까요?
+                </div>
               )}
             </div>
-
-            {/* 음성 인식 상태 표시 */}
-            <motion.div 
-              className="bg-slate-800 bg-opacity-80 rounded-2xl p-4 text-center"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.5 }}
-            >
-              <div className="flex items-center justify-center space-x-4">
-                <button
-                  onClick={toggleListening}
-                  className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-                    isListening 
-                      ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse' 
-                      : 'bg-slate-600 hover:bg-slate-500 text-white'
-                  }`}
-                >
-                  {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-                </button>
-                
-                <div className="text-white">
-                  {isListening ? (
-                    <div className="text-sm font-medium">
-                      듣고 있어요...
-                    </div>
-                  ) : (
-                    <div className="text-sm">
-                      마이크를 클릭해서 말해보세요
-                    </div>
-                  )}
-                </div>
-              </div>
-              
-              {transcript && (
-                <div className="mt-3 p-2 bg-blue-900 bg-opacity-50 rounded-lg text-sm text-blue-200">
-                  "{transcript}"
-                </div>
-              )}
-            </motion.div>
           </div>
         </motion.div>
-      </div>
+
+
       
-      {/* 마이크 버튼 - 하단 중앙 */}
-      <motion.div 
-        className="relative flex justify-center pb-8"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.6 }}
-      >
+        {/* 메인 마이크 버튼 - 절대 위치로 하단 완전 고정 */}
+        <motion.div 
+          className="absolute bottom-8 left-0 right-0 flex justify-center z-20"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+        >
 
         
         <button 

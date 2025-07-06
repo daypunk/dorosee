@@ -7,6 +7,7 @@ import App from './App.jsx'
 // 전역 테스트 도구 로드 (개발 환경에서만)
 if (import.meta.env.DEV) {
   import('./utils/globalTestUtils.js');
+  import('./utils/debugHelper.js');
 }
 
 createRoot(document.getElementById('root')).render(

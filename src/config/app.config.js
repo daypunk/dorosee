@@ -16,12 +16,13 @@ export const API_CONFIG = {
 
 // TTS 설정
 export const TTS_CONFIG = {
+  DEFAULT_MODE: 'openai',   // 기본 TTS 모드: OpenAI
   VOICES: {
-    ACTIVE: 'shimmer',      // 활발한 여성 음성
-    ALTERNATIVES: ['nova', 'alloy', 'echo', 'fable', 'onyx']
+    ACTIVE: 'nova',         // 활발한 여성 음성 (OpenAI)
+    ALTERNATIVES: ['shimmer', 'alloy', 'echo', 'fable', 'onyx']
   },
   SETTINGS: {
-    SPEED: 1.1,             // 조금 빠르게
+    SPEED: 1.2,             // 조금 빠르게
     TEMPERATURE: 0.8,       // 활발한 표현
     MAX_TOKENS: {
       WEATHER: 50,          // 🎯 날씨는 매우 간결하게

@@ -1,23 +1,48 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 function PWAThankYou() {
+  const navigate = useNavigate();
+
   return (
     <div className="h-screen bg-white text-gray-800 flex justify-center">
       <div className="w-full max-w-md flex flex-col justify-center items-center px-6">
-        <div className="text-center">
+        <motion.div 
+          className="text-center"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          {/* 로고 */}
+          <img src="/dorosee_logo2.svg" alt="Dorosee Logo" className="h-8 mx-auto mb-8" />
+          
           <div className="mb-8">
-            <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <motion.div 
+              className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-6"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
               </svg>
-            </div>
-            <h1 className="text-3xl font-bold mb-4 text-green-600">제보가 완료되었습니다</h1>
-            <p className="text-gray-600 leading-relaxed">
+            </motion.div>
+            <h1 className="text-xl font-bold mb-4 text-gray-900">제보가 완료되었습니다</h1>
+            <p className="text-gray-600 text-sm leading-relaxed mb-8">
               소중한 정보를 제공해 주셔서 감사합니다.<br />
               빠르게 실종자를 찾을 수 있도록 노력하겠습니다.
             </p>
+            
+            {/* 버튼 */}
+            <button 
+              onClick={() => navigate('/pwa')}
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 px-4 rounded-md font-medium transition-colors text-sm"
+            >
+              다른 실종자 보기
+            </button>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

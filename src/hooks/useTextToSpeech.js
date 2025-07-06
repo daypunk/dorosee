@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 
 const useTextToSpeech = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [ttsMode, setTtsMode] = useState('web'); // 'web' 또는 'openai'
+  const [ttsMode, setTtsMode] = useState('openai'); // 'web' 또는 'openai'
   const synthRef = useRef(null);
   const audioRef = useRef(null);
 

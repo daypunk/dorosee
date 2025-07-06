@@ -10,4 +10,14 @@ body {
   color: white;
   margin: 0;
   padding: 0;
+}
+
+/* 스크롤바 숨기기 */
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 } 

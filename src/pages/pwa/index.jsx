@@ -80,10 +80,10 @@ function PWAIndex() {
   return (
     <div className="h-screen bg-white text-gray-800 flex justify-center overflow-hidden">
       <div className="w-full max-w-md flex flex-col px-6 py-8">
-        {/* 헤더 - Home.jsx와 동일한 구조 */}
-        <div className="text-center mb-6">
+        {/* 헤더 - 간격 조정 */}
+        <div className="text-center mb-8">
           <motion.div 
-            className="mb-6"
+            className="mb-0"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -102,8 +102,19 @@ function PWAIndex() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
+            className="mb-4"
           >
             <img src="/dorosee_logo2.svg" alt="Dorosee Logo" className="h-8 mx-auto" />
+          </motion.div>
+          
+          {/* 제보 플랫폼 타이틀 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="mb-4"
+          >
+            <h2 className="text-lg font-semibold text-gray-800 text-center">제보 플랫폼</h2>
           </motion.div>
         </div>
         
@@ -122,52 +133,81 @@ function PWAIndex() {
                 : null;
 
               return (
-                <div
+                <motion.div
                   key={index}
-                  className="bg-white border border-gray-200 rounded-lg p-4 shadow-md active:bg-gray-50 transition-colors cursor-pointer"
+                  className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md active:scale-98 transition-all duration-200 cursor-pointer"
                   onClick={() => navigate(`/pwa/detail/${item.nm || index}`)}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <div className="flex gap-4">
+                  <div className="flex gap-3">
+                    {/* 사진 영역 */}
                     <div className="flex-shrink-0">
                       {photo ? (
                         <img
                           src={photo}
                           alt={`${name} 사진`}
-                          className="w-16 h-20 object-cover rounded-lg border border-gray-300"
+                          className="w-18 h-22 object-cover rounded-md border border-gray-300"
                           onError={(e) => (e.target.style.display = 'none')}
                         />
                       ) : (
-                        <div className="w-16 h-20 bg-gray-100 rounded-lg border border-gray-300 flex items-center justify-center">
-                          <span className="text-xs text-gray-500">사진<br/>없음</span>
+                        <div className="w-18 h-22 bg-gray-100 rounded-md border border-gray-300 flex flex-col items-center justify-center">
+                          <svg className="w-5 h-5 text-gray-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                          <span className="text-xs text-gray-500 text-center leading-tight">사진<br/>없음</span>
                         </div>
                       )}
                     </div>
+                    
+                    {/* 정보 영역 */}
                     <div className="flex-1 min-w-0">
+                      {/* 이름과 화살표 */}
                       <div className="flex justify-between items-start mb-3">
-                        <h3 className="text-lg font-semibold text-blue-600 truncate">{name}</h3>
-                        <span className="text-xs text-blue-500 ml-2 flex-shrink-0">자세히 →</span>
+                        <h3 className="text-lg font-bold text-gray-900 truncate pr-2">{name}</h3>
+                        <svg className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
                       </div>
-                      <div className="space-y-2 text-sm">
+                      
+                      {/* 기본 정보 - 간단한 텍스트 형태 */}
+                      <div className="space-y-2 text-xs">
                         <div className="flex justify-between">
-                          <span className="text-gray-600">성별</span>
-                          <span className="text-gray-800 font-medium">{gender}</span>
+                          <span className="text-gray-500">성별 · 나이</span>
+                          <span className="text-gray-700">{gender} · {age}세</span>
                         </div>
+                        
                         <div className="flex justify-between">
-                          <span className="text-gray-600">나이</span>
-                          <span className="text-gray-800 font-medium">{age}세</span>
+                          <span className="text-gray-500">실종일</span>
+                          <span className="text-gray-700">{date}</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">실종일</span>
-                          <span className="text-gray-800 font-medium">{date}</span>
-                        </div>
-                        <div className="mt-2">
-                          <span className="text-gray-600 text-xs">실종장소</span>
-                          <p className="text-gray-800 text-xs leading-relaxed mt-1 break-words">{address}</p>
+                        
+                        <div className="pt-1">
+                          <div className="text-gray-500 mb-1">실종장소</div>
+                          <div className="text-gray-700 leading-relaxed break-words">{address}</div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                  
+                  {/* 하단 상태 표시 */}
+                  <div className="mt-4 pt-3 border-t border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2.5 h-2.5 bg-orange-500 rounded-full"></div>
+                        <span className="text-xs font-medium text-gray-700">실종 신고</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <span className="text-xs text-gray-500">자세히 보기</span>
+                        <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
               );
             })}
           </div>

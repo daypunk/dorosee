@@ -64,12 +64,19 @@ class WeatherService {
       const apiUrl = `${this.baseUrl}?${params}`;
       console.log('기상청 API 요청 URL (키 마스킹):', apiUrl.replace(processedApiKey, '***API_KEY***'));
       
+      // 타임아웃 설정 (15초로 확대)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      
       const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
           'Accept': 'application/json'
-        }
+        },
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
       
       console.log('기상청 API 응답 상태:', response.status, response.statusText);
       console.log('응답 헤더 Content-Type:', response.headers.get('content-type'));
