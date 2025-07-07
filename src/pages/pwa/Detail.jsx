@@ -203,24 +203,24 @@ function PWADetail() {
                 {/* 목격 시간 - 날짜와 시간 분리 */}
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-2">목격 시간</label>
-                  <div className="flex gap-2 w-full">
-                    <div className="flex-1">
+                  <div className="space-y-3">
+                    <div>
                       <input 
                         type="date" 
                         value={dateValue}
                         onChange={(e) => setDateValue(e.target.value)}
                         required 
                         max={new Date().toISOString().split('T')[0]}
-                        className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
+                        className="w-full px-3 py-3 bg-white border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
                       />
                     </div>
-                    <div className="flex-1">
+                    <div>
                       <input 
                         type="time" 
                         value={timeValue}
                         onChange={(e) => setTimeValue(e.target.value)}
                         required 
-                        className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
+                        className="w-full px-3 py-3 bg-white border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
                       />
                     </div>
                   </div>
