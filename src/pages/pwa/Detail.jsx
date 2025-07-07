@@ -214,16 +214,16 @@ function PWADetail() {
                 {/* 목격 시간 - 날짜와 시간 분리 */}
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-2">목격 시간</label>
-                  <div className="flex gap-3">
-                    <div className="flex flex-col gap-2 flex-1">
+                  <div className="grid grid-cols-2 gap-2 w-full">
+                    <div className="min-w-0">
                       <Popover open={open} onOpenChange={setOpen}>
                         <PopoverTrigger asChild>
                           <Button
                             variant="outline"
-                            className="w-full justify-between font-normal text-xs h-10 px-3 text-gray-700 border-gray-300 hover:border-orange-500 focus:ring-2 focus:ring-orange-500"
+                            className="w-full justify-between font-normal text-xs h-10 px-2 text-gray-700 border-gray-300 hover:border-orange-500 focus:ring-2 focus:ring-orange-500 min-w-0"
                           >
-                            {date ? date.toLocaleDateString('ko-KR') : "목격한 날짜"}
-                            <ChevronDownIcon className="h-4 w-4" />
+                            <span className="truncate">{date ? date.toLocaleDateString('ko-KR') : "목격한 날짜"}</span>
+                            <ChevronDownIcon className="h-4 w-4 flex-shrink-0 ml-1" />
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto overflow-hidden p-0" align="start">
@@ -239,11 +239,11 @@ function PWADetail() {
                         </PopoverContent>
                       </Popover>
                     </div>
-                    <div className="flex flex-col gap-2 flex-1">
+                    <div className="min-w-0">
                       <Input
                         type="time"
                         required
-                        className="w-full text-xs h-10 px-3 text-gray-700 border-gray-300 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        className="w-full text-xs h-10 px-2 text-gray-700 border-gray-300 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 min-w-0"
                       />
                     </div>
                   </div>
