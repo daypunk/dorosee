@@ -201,19 +201,29 @@ function PWADetail() {
                 {/* 목격 시간 - 날짜와 시간 분리 */}
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-2">목격 시간</label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-xs text-gray-400 mb-1">날짜</label>
                       <input 
                         type="date" 
                         required 
-                        className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
+                        className="w-full min-w-[120px] px-3 py-3 sm:py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 text-sm sm:text-xs focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 appearance-none"
+                        style={{
+                          WebkitAppearance: 'none',
+                          MozAppearance: 'textfield'
+                        }}
                       />
                     </div>
-                    <div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-xs text-gray-400 mb-1">시간</label>
                       <input 
                         type="time" 
                         required 
-                        className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
+                        className="w-full min-w-[100px] px-3 py-3 sm:py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 text-sm sm:text-xs focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 appearance-none"
+                        style={{
+                          WebkitAppearance: 'none',
+                          MozAppearance: 'textfield'
+                        }}
                       />
                     </div>
                   </div>
