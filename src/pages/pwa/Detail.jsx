@@ -203,48 +203,25 @@ function PWADetail() {
                 {/* 목격 시간 - 날짜와 시간 분리 */}
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-2">목격 시간</label>
-                  <div className="w-full overflow-hidden">
-                    <div className="flex gap-2">
-                      {/* 날짜 입력 */}
-                      <div className="relative" style={{ width: 'calc(50% - 4px)' }}>
-                        <input 
-                          type="date" 
-                          value={dateValue}
-                          onChange={(e) => setDateValue(e.target.value)}
-                          required 
-                          max={new Date().toISOString().split('T')[0]}
-                          className="w-full h-10 px-2 bg-white border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
-                          style={{ 
-                            colorScheme: 'light',
-                            fontSize: '12px'
-                          }}
-                        />
-                        {!dateValue && (
-                          <div className="absolute inset-0 flex items-center px-2 pointer-events-none">
-                            <span className="text-gray-400 text-xs">목격한 날짜</span>
-                          </div>
-                        )}
-                      </div>
-                      
-                      {/* 시간 입력 */}
-                      <div className="relative" style={{ width: 'calc(50% - 4px)' }}>
-                        <input 
-                          type="time" 
-                          value={timeValue}
-                          onChange={(e) => setTimeValue(e.target.value)}
-                          required 
-                          className="w-full h-10 px-2 bg-white border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
-                          style={{ 
-                            colorScheme: 'light',
-                            fontSize: '12px'
-                          }}
-                        />
-                        {!timeValue && (
-                          <div className="absolute inset-0 flex items-center px-2 pointer-events-none">
-                            <span className="text-gray-400 text-xs">목격한 시간</span>
-                          </div>
-                        )}
-                      </div>
+                  <div className="flex gap-2 w-full">
+                    <div className="flex-1">
+                      <input 
+                        type="date" 
+                        value={dateValue}
+                        onChange={(e) => setDateValue(e.target.value)}
+                        required 
+                        max={new Date().toISOString().split('T')[0]}
+                        className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <input 
+                        type="time" 
+                        value={timeValue}
+                        onChange={(e) => setTimeValue(e.target.value)}
+                        required 
+                        className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
+                      />
                     </div>
                   </div>
                 </div>
