@@ -1,12 +1,32 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 function PWAThankYou() {
   const navigate = useNavigate();
 
+  // 🔧 페이지 로드 시 viewport 스케일 리셋 (모바일 줌 문제 해결)
+  useEffect(() => {
+    const resetViewport = () => {
+      // 기존 viewport meta 태그 찾기
+      let viewport = document.querySelector('meta[name="viewport"]');
+      
+      if (viewport) {
+        // 기존 viewport를 일시적으로 업데이트
+        viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+        
+        // 잠시 후 다시 원래대로 복원
+        setTimeout(() => {
+          viewport.setAttribute('content', 'width=device-width, initial-scale=1.0');
+        }, 100);
+      }
+    };
+
+    resetViewport();
+  }, []);
+
   return (
-    <div className="h-screen bg-white text-gray-800 flex justify-center">
+    <div className="h-screen bg-white text-gray-800 flex justify-center" style={{ transform: 'scale(1)', transformOrigin: 'top left' }}>
       <div className="w-full max-w-md flex flex-col justify-center items-center px-6">
         <motion.div 
           className="text-center"
