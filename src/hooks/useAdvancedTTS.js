@@ -1,16 +1,45 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 
 const useAdvancedTTS = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [ttsMode, setTtsMode] = useState('openai'); // 'web', 'openai', 'ttsmaker'
+  const [isAudioContextInitialized, setIsAudioContextInitialized] = useState(false);
   const synthRef = useRef(null);
   const audioRef = useRef(null);
+  const audioContextRef = useRef(null);
+
+  // 모바일 감지
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
   const initializeSpeech = useCallback(() => {
     if ('speechSynthesis' in window) {
       synthRef.current = window.speechSynthesis;
     }
   }, []);
+
+  // 🔧 모바일 오디오 컨텍스트 초기화 (사용자 상호작용 시 호출)
+  const initializeAudioContext = useCallback(() => {
+    if (!isMobile || isAudioContextInitialized) return Promise.resolve();
+
+    return new Promise((resolve) => {
+      console.log('📱 모바일 오디오 컨텍스트 초기화 시작');
+      
+      // 더미 오디오 재생으로 오디오 컨텍스트 활성화
+      const dummyAudio = new Audio();
+      dummyAudio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmEaBSuq7f6lFhAKgQG5jdBgHwYqr';
+      dummyAudio.volume = 0.01;
+      
+      dummyAudio.play().then(() => {
+        console.log('✅ 모바일 오디오 컨텍스트 초기화 완료');
+        setIsAudioContextInitialized(true);
+        resolve();
+      }).catch((error) => {
+        console.warn('⚠️ 모바일 오디오 컨텍스트 초기화 실패:', error);
+        setIsAudioContextInitialized(true); // 실패해도 시도는 했다고 마킹
+        resolve();
+      });
+    });
+  }, [isMobile, isAudioContextInitialized]);
 
   // 1. 웹 브라우저 내장 TTS
   const speakWithWeb = useCallback((text) => {
@@ -73,6 +102,12 @@ const useAdvancedTTS = () => {
       return await speakWithWeb(text);
     }
 
+    // 🔧 모바일에서 오디오 컨텍스트 초기화 확인
+    if (isMobile && !isAudioContextInitialized) {
+      console.warn('📱 모바일에서 오디오 컨텍스트가 초기화되지 않아서 웹 TTS로 대체');
+      return await speakWithWeb(text);
+    }
+
     try {
       setIsSpeaking(true);
       console.log('OpenAI TTS 호출 시작:', text.substring(0, 30) + '...');
@@ -105,6 +140,12 @@ const useAdvancedTTS = () => {
 
       audioRef.current = new Audio(audioUrl);
       
+      // 🔧 모바일에서 오디오 설정 최적화
+      if (isMobile) {
+        audioRef.current.preload = 'auto';
+        audioRef.current.volume = 1.0;
+      }
+      
       // Promise로 재생 완료를 기다림
       return new Promise((resolve, reject) => {
         audioRef.current.onended = () => {
@@ -121,13 +162,21 @@ const useAdvancedTTS = () => {
           resolve(); // 오류 시에도 resolve
         };
 
+        // 🔧 모바일에서 재생 실패 시 웹 TTS로 fallback
         audioRef.current.play().then(() => {
           console.log('OpenAI TTS 재생 시작');
         }).catch((playError) => {
           console.error('OpenAI TTS 재생 시작 오류:', playError);
           setIsSpeaking(false);
           URL.revokeObjectURL(audioUrl);
-          resolve();
+          
+          // 모바일에서 재생 실패 시 웹 TTS로 대체
+          if (isMobile) {
+            console.warn('📱 모바일에서 OpenAI TTS 재생 실패, 웹 TTS로 대체');
+            speakWithWeb(text).then(resolve).catch(resolve);
+          } else {
+            resolve();
+          }
         });
       });
 
@@ -136,7 +185,7 @@ const useAdvancedTTS = () => {
       setIsSpeaking(false);
       return await speakWithWeb(text);
     }
-  }, [speakWithWeb]);
+  }, [speakWithWeb, isMobile, isAudioContextInitialized]);
 
   // 3. TTSMaker API
   const speakWithTTSMaker = useCallback(async (text) => {
@@ -215,6 +264,12 @@ const useAdvancedTTS = () => {
   const speakText = useCallback(async (text) => {
     if (!text) return Promise.resolve();
 
+    // 🔧 모바일에서 첫 번째 TTS 호출 시 오디오 컨텍스트 초기화
+    if (isMobile && !isAudioContextInitialized) {
+      console.log('📱 모바일에서 첫 번째 TTS 호출 - 오디오 컨텍스트 초기화 시도');
+      await initializeAudioContext();
+    }
+
     console.log(`TTS 모드: ${ttsMode}, 텍스트: ${text.substring(0, 50)}...`);
 
     switch (ttsMode) {
@@ -226,7 +281,7 @@ const useAdvancedTTS = () => {
       default:
         return await speakWithWeb(text);
     }
-  }, [ttsMode, speakWithTTSMaker, speakWithOpenAI, speakWithWeb]);
+  }, [ttsMode, speakWithTTSMaker, speakWithOpenAI, speakWithWeb, isMobile, isAudioContextInitialized, initializeAudioContext]);
 
   const stopSpeaking = useCallback(() => {
     // 웹 TTS 중지
@@ -293,7 +348,9 @@ const useAdvancedTTS = () => {
     speakText,
     stopSpeaking,
     switchTTSMode,
-    getAvailableModes
+    getAvailableModes,
+    initializeAudioContext, // 🔧 모바일 오디오 컨텍스트 초기화
+    isAudioContextInitialized // 🔧 모바일 오디오 컨텍스트 초기화 상태
   };
 };
 

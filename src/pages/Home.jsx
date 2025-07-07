@@ -21,7 +21,7 @@ function Home() {
   const chatScrollRef = useRef(null)
   
   const { messages, sendMessage, isLoading, clearMessages } = useChat()
-  const { speakText, stopSpeaking, initializeSpeech } = useAdvancedTTS()
+  const { speakText, stopSpeaking, initializeSpeech, initializeAudioContext } = useAdvancedTTS()
   
   // 권한 요청 함수
   const requestPermissions = async () => {
@@ -78,8 +78,11 @@ function Home() {
     navigate('/pwa')
   }
 
-  const handleChatBotToggle = () => {
+  const handleChatBotToggle = async () => {
     if (!isChatMode) {
+      // 🔧 모바일에서 마이크 클릭 시 오디오 컨텍스트 초기화
+      await initializeAudioContext()
+      
       setIsChatMode(true)
       // TTS 초기화
       initializeSpeech()
@@ -159,10 +162,12 @@ function Home() {
     resetInactivityTimer()
   }
 
-  const toggleListening = () => {
+  const toggleListening = async () => {
     if (isListening) {
       stopListening()
     } else {
+      // 🔧 모바일에서 마이크 클릭 시 오디오 컨텍스트 초기화
+      await initializeAudioContext()
       startListening()
     }
     // 마이크 토글만으로는 타이머 리셋하지 않음
