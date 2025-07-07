@@ -211,7 +211,7 @@ function PWADetail() {
                         onChange={(e) => setDateValue(e.target.value)}
                         required 
                         max={new Date().toISOString().split('T')[0]}
-                        className="w-full px-3 py-3 bg-white border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
+                        className="w-52 px-3 py-4 h-11 bg-white border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
                       />
                     </div>
                     <div>
@@ -220,7 +220,7 @@ function PWADetail() {
                         value={timeValue}
                         onChange={(e) => setTimeValue(e.target.value)}
                         required 
-                        className="w-full px-3 py-3 bg-white border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
+                        className="w-52 px-3 py-4 h-11 bg-white border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
                       />
                     </div>
                   </div>
