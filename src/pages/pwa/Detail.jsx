@@ -190,12 +190,12 @@ function PWADetail() {
                 {/* 목격 장소 */}
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-2">목격 장소</label>
-                                      <input 
-                      type="text" 
-                      placeholder="목격한 구체적인 장소를 입력하세요" 
-                      required 
-                      className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-400 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
-                    />
+                  <input 
+                    type="text" 
+                    placeholder="목격한 구체적인 장소를 입력하세요" 
+                    required 
+                    className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
+                  />
                 </div>
 
                 {/* 목격 시간 - 날짜와 시간 분리 */}
@@ -203,19 +203,19 @@ function PWADetail() {
                   <label className="block text-xs font-medium text-gray-500 mb-2">목격 시간</label>
                   <div className="flex flex-col md:flex-row gap-3">
                     <div className="flex-1">
+                      <label className="block text-xs text-gray-400 mb-1">목격한 날짜</label>
                       <input 
                         type="date" 
-                        placeholder="목격한 날짜를 선택하세요"
                         required 
-                        className="w-full min-w-0 px-3 py-3 md:py-2.5 bg-white border border-gray-300 rounded-md text-gray-400 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm md:text-xs"
+                        className="w-full min-w-0 px-3 py-3 md:py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm md:text-xs"
                       />
                     </div>
                     <div className="flex-1">
+                      <label className="block text-xs text-gray-400 mb-1">목격한 시간</label>
                       <input 
                         type="time" 
-                        placeholder="목격한 시간을 선택하세요"
                         required 
-                        className="w-full min-w-0 px-3 py-3 md:py-2.5 bg-white border border-gray-300 rounded-md text-gray-400 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm md:text-xs"
+                        className="w-full min-w-0 px-3 py-3 md:py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm md:text-xs"
                       />
                     </div>
                   </div>
@@ -224,23 +224,23 @@ function PWADetail() {
                 {/* 인상착의 */}
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-2">인상착의</label>
-                                      <input 
-                      type="text" 
-                      placeholder="옷차림, 특징 등을 입력하세요" 
-                      required 
-                      className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-400 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
-                    />
+                  <input 
+                    type="text" 
+                    placeholder="옷차림, 특징 등을 입력하세요" 
+                    required 
+                    className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
+                  />
                 </div>
 
                 {/* 기타 특이사항 */}
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-2">기타 특이사항</label>
-                                      <textarea 
-                      placeholder="함께 있던 사람, 상황, 행동 등 추가 정보를 입력하세요" 
-                      required 
-                      rows="3"
-                      className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-400 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none text-xs"
-                    />
+                  <textarea 
+                    placeholder="함께 있던 사람, 상황, 행동 등 추가 정보를 입력하세요" 
+                    required 
+                    rows="3"
+                    className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none text-xs"
+                  />
                 </div>
                 
                 {/* 제보하기 버튼 */}
