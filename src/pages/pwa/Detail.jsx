@@ -201,23 +201,19 @@ function PWADetail() {
                 {/* 목격 시간 - 날짜와 시간 분리 */}
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-2">목격 시간</label>
-                  <div className="flex flex-col md:flex-row gap-3">
-                    <div className="flex-1">
-                      <label className="block text-xs text-gray-400 mb-1">목격한 날짜</label>
-                      <input 
-                        type="date" 
-                        required 
-                        className="w-full min-w-0 px-3 py-3 md:py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm md:text-xs"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <label className="block text-xs text-gray-400 mb-1">목격한 시간</label>
-                      <input 
-                        type="time" 
-                        required 
-                        className="w-full min-w-0 px-3 py-3 md:py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm md:text-xs"
-                      />
-                    </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <input 
+                      type="date" 
+                      title="목격한 날짜를 선택하세요"
+                      required 
+                      className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
+                    />
+                    <input 
+                      type="time" 
+                      title="목격한 시간을 선택하세요"
+                      required 
+                      className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
+                    />
                   </div>
                 </div>
 
