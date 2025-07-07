@@ -1,11 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { ChevronDownIcon } from 'lucide-react';
+
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 function PWADetail() {
   const { id } = useParams();
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [date, setDate] = useState(undefined);
   const navigate = useNavigate();
 
   // 페이지가 열릴 때 ID로 API 요청
@@ -120,7 +133,7 @@ function PWADetail() {
         </motion.div>
 
         {/* 스크롤 가능한 콘텐츠 */}
-        <div className="flex-1 overflow-y-auto space-y-6">
+        <div className="flex-1 overflow-y-auto space-y-6 pb-16">
           {/* 실종자 정보 카드 */}
           <motion.div 
             className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
@@ -201,19 +214,38 @@ function PWADetail() {
                 {/* 목격 시간 - 날짜와 시간 분리 */}
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-2">목격 시간</label>
-                  <div className="grid grid-cols-2 gap-3 w-full">
-                    <input 
-                      type="date" 
-                      title="목격한 날짜를 선택하세요"
-                      required 
-                      className="w-full min-w-0 px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
-                    />
-                    <input 
-                      type="time" 
-                      title="목격한 시간을 선택하세요"
-                      required 
-                      className="w-full min-w-0 px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
-                    />
+                  <div className="flex gap-3">
+                    <div className="flex flex-col gap-2 flex-1">
+                      <Popover open={open} onOpenChange={setOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-between font-normal text-xs h-10 px-3 text-gray-700 border-gray-300 hover:border-orange-500 focus:ring-2 focus:ring-orange-500"
+                          >
+                            {date ? date.toLocaleDateString('ko-KR') : "목격한 날짜"}
+                            <ChevronDownIcon className="h-4 w-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={date}
+                            onSelect={(date) => {
+                              setDate(date);
+                              setOpen(false);
+                            }}
+                            disabled={(date) => date > new Date()}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    <div className="flex flex-col gap-2 flex-1">
+                      <Input
+                        type="time"
+                        required
+                        className="w-full text-xs h-10 px-3 text-gray-700 border-gray-300 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      />
+                    </div>
                   </div>
                 </div>
 
