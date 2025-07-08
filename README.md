@@ -2,48 +2,53 @@
 
 > 거리에서 만나는 친근한 AI 커뮤니케이터
 
-도로시는 시민들이 일상에서 필요한 정보를 쉽고 빠르게 얻을 수 있도록 도와주는 음성 기반 AI 무인이동체입니다.
-기존 실외 배달로봇의 생태계를 활용하여 공공에 실질적인 가치를 전달하고자 해요.
-자율주행은 Unity 시뮬레이션으로 검증했고, 객체탐지는 YOLO와 Mediapipe를 사용했어요.
+## 📋 프로젝트 개요
 
-현재 repository는 도로시의 웹 기반 기능들을 담고 있어요.
-길 안내부터 날씨 정보, 실종자 제보까지 - 마치 동네에서 친근한 이웃을 만난 것처럼 자연스럽게 대화할 수 있습니다.
-과기부 장관상을 목표로 합니다. 🏆
+도로시는 시민들이 일상에서 필요한 정보를 음성으로 쉽고 빠르게 얻을 수 있도록 도와주는 AI 플랫폼입니다. 
+길 안내, 날씨 정보, 주변 시설 검색, 실종자 제보 등의 기능을 자연스러운 음성 대화로 제공합니다.
 
-## 핸들링 웹 주요 기능
+## ✨ 주요 기능
 
-### 💬 음성 대화
-- **말하기**: 마이크 버튼 클릭 후 바로 대화 시작
-- **듣기**: OpenAI TTS, 브라우저 TTS 등 다양한 음성 출력 옵션
-- **자연스러운 응답**: 단답이 아닌 친근하고 도움되는 대화
+### 음성 인터페이스
+- **STT**: Web Speech API 기반 실시간 음성 인식
+- **TTS**: OpenAI TTS + 브라우저 내장 TTS fallback
+- **자연스러운 대화**: 2문장 이내의 간결하고 친근한 AI 응답
 
-### 📍 위치 기반 서비스
-- **지하철역 찾기**: "지하철역 어디 있어?" → 가장 가까운 역과 도보 시간 안내
-- **편의점 찾기**: 주변 편의점 검색 및 거리 정보
-- **현재 위치**: 카카오맵 기반 정확한 주소 정보
+### 위치 기반 서비스
+- **실시간 위치 검색**: GPS 기반 주변 시설 안내
+- **지하철역 찾기**: 가장 가까운 역과 도보 시간 제공
+- **편의점 검색**: 거리별 정렬된 주변 편의점 정보
+- **카카오맵 연동**: 정확한 위치 정보와 길찾기 서비스
 
-### 🌤️ 날씨 정보
-- 기상청 단기예보 API 기반 정확한 날씨 정보
-- 실시간 기온, 강수형태, 하늘상태
-- 상황별 맞춤 조언 ("우산 꼭 챙기시고", "따뜻하게 입으세요" 등)
-- GPS 좌표 자동 변환으로 정확한 지역별 날씨
+### 날씨 정보
+- **기상청 단기예보 API**: 실시간 정확한 날씨 정보
+- **맞춤형 조언**: 상황별 생활 팁 제공
+- **지역별 예보**: GPS 좌표 기반 세밀한 지역 날씨
 
-### 👥 실종자 제보
-- 실시간 실종자 정보 조회
-- 간편한 목격 제보 시스템
-- 상세 정보 및 제보 폼 제공
+### 실종자 제보 플랫폼
+- **정부 API 연동**: 안전Dream 실종자 정보 실시간 조회
+- **모바일 PWA**: 앱 설치 없이 사용 가능한 웹앱
+- **제보 시스템**: 간편한 목격 정보 입력 폼
+- **개인정보 보호**: 블러 처리된 사진으로 프라이버시 보장
 
-## 웹에선 어떤 걸 썼나요? 🚀
+## 🚀 Stack
 
-```
-Frontend: React 19 + Vite
-UI: TailwindCSS + Framer Motion
-애니메이션: Rive
-음성: Web Speech API + OpenAI TTS
-지도: 카카오맵 API
-라우팅: React Router
-HTTP: Fetch API
-```
+### Frontend
+- **React 19** + **Vite**
+- **TailwindCSS**
+- **Framer Motion**
+- **Rive**
+
+### AI & Service
+- **OpenAI GPT-4o**
+- **OpenAI TTS nova**
+- **Web Speech API**
+
+### API
+- **카카오맵 API**: 위치 서비스
+- **기상청 단기예보 API**: 날씨 정보
+- **안전Dream API**: 실종자 정보
+
 
 ## 🛠️ 설치 및 실행
 
@@ -57,7 +62,6 @@ npm install
 
 # 환경변수 설정
 cp .env.example .env.local
-# .env.local에서 API 키들 설정
 
 # 개발 서버 실행
 npm run dev
@@ -65,24 +69,21 @@ npm run dev
 
 ## 🔑 환경변수 설정
 
-`.env.local` 파일에 다음 정보를 설정해주세요:
+`.env.local` 파일에 다음 API 키들을 설정해주세요:
 
 ```bash
-# OpenAI (TTS/채팅)
-VITE_OPENAI_API_KEY=sk-your-openai-key
+# OpenAI API (필수)
+VITE_OPENAI_API_KEY=your-openai-key
 
-# 카카오맵 (위치 서비스)
-VITE_KAKAO_API_KEY=your-kakao-key
+# 카카오맵 API (필수)
+VITE_KAKAO_API_KEY=your-kakao-rest-api-key
 
-# 기상청 단기예보 API (날씨 정보)
-VITE_WEATHER_API_KEY=your-kma-servicekey
+# 기상청 단기예보 API (필수)
+VITE_WEATHER_API_KEY=your-weather-servicekey
 
-# 실종자 API
+# 실종자 API (필수)
 VITE_MISSING_PERSON_ESNTL_ID=your-esntl-id
 VITE_MISSING_PERSON_AUTH_KEY=your-auth-key
-
-# TTSMaker (선택)
-VITE_TTSMAKER_API_KEY=your-ttsmaker-key
 ```
 
 ## 📁 프로젝트 구조
@@ -90,24 +91,31 @@ VITE_TTSMAKER_API_KEY=your-ttsmaker-key
 ```
 src/
 ├── components/
-│   ├── chat/           # 챗봇 관련 컴포넌트
-│   └── debug/          # 개발용 테스트 도구
-├── hooks/              # 커스텀 훅
-│   ├── useChat.js      # 채팅 로직
-│   └── useAdvancedTTS.js # TTS 관리
-├── services/           # API 서비스
-│   ├── aiService.js    # AI 응답 생성
-│   ├── kakaoLocationService.js # 위치 서비스
-│   └── weatherService.js # 날씨 정보 (기상청 API)
+│   ├── chat/               # 챗봇 UI 컴포넌트
+│   └── debug/              # 개발 도구
+├── hooks/
+│   ├── useChat.js          # 채팅 로직 관리
+│   └── useAdvancedTTS.js   # TTS 시스템 관리
+├── services/
+│   ├── aiService.js        # OpenAI API 통합
+│   ├── kakaoLocationService.js  # 위치 서비스
+│   └── weatherService.js   # 날씨 정보 API
 ├── pages/
-│   ├── Home.jsx        # 메인 화면
-│   └── pwa/            # 실종자 제보 시스템
-└── utils/              # 유틸리티 함수
+│   ├── Home.jsx            # 메인 음성 대화 화면
+│   └── pwa/                # 실종자 제보 PWA
+│       ├── index.jsx       # 실종자 목록
+│       ├── Detail.jsx      # 상세 정보 및 제보 폼
+│       └── ThankYou.jsx    # 제보 완료 페이지
+└── utils/                  # 유틸리티 함수
 ```
 
-*"기술로 사람과 사람을 연결하는 따뜻한 서비스"* - 도로시 팀
-- 김대희(PM)
-- 홍승완(Backend/CV)
-- 최예희(AI/CV)
-- 이동건(AI/UX)
-- 백하림(Frontend/UX)
+
+## 🏆 개발팀
+
+**도로시 팀** - 기술로 사람과 사람을 연결하는 따뜻한 서비스
+
+- **김대희** (PM)
+- **홍승완** (Physical/CV)
+- **최예희** (AI/CV)
+- **이동건** (AI/UX)
+- **백하림** (Frontend/UX)

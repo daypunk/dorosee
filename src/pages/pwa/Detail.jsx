@@ -1,3 +1,9 @@
+/**
+ * Missing Person Report Detail Page
+ * Displays detailed information about a missing person and provides a report submission form
+ * with date/time pickers for witness information.
+ */
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -10,14 +16,11 @@ function PWADetail() {
   const [timeValue, setTimeValue] = useState('');
   const navigate = useNavigate();
 
-  // 페이지가 열릴 때 ID로 API 요청
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 로컬과 배포 모두 프록시 사용 (CORS 문제 해결)
         const baseUrl = '/api/lcm/findChildList.do';
         
-        // URL 파라미터 생성
         const params = new URLSearchParams({
           esntlId: import.meta.env.VITE_MISSING_PERSON_ESNTL_ID || 10000764,
           authKey: import.meta.env.VITE_MISSING_PERSON_AUTH_KEY || '197f67addf144f4e',
@@ -95,14 +98,12 @@ function PWADetail() {
   return (
     <div className="h-screen bg-white text-gray-800 flex justify-center overflow-hidden">
       <div className="w-full max-w-md flex flex-col px-6 py-8">
-        {/* 헤더 */}
         <motion.div 
           className="mb-8"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          {/* 뒤로가기 버튼 */}
           <div className="flex items-center justify-between mb-6">
             <button
               onClick={() => navigate('/pwa')}
@@ -121,9 +122,7 @@ function PWADetail() {
           </div>
         </motion.div>
 
-        {/* 스크롤 가능한 콘텐츠 */}
         <div className="flex-1 overflow-y-auto space-y-6 pb-16">
-          {/* 실종자 정보 카드 */}
           <motion.div 
             className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
             initial={{ opacity: 0, y: 20 }}
@@ -169,7 +168,6 @@ function PWADetail() {
             </div>
           </motion.div>
 
-          {/* 제보 폼 */}
           <motion.div 
             className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
             initial={{ opacity: 0, y: 20 }}
@@ -189,7 +187,6 @@ function PWADetail() {
               <p className="text-gray-600 text-sm mb-4">상세히 기입해 주시면 실종자를 더 빨리 찾을 수 있습니다.</p>
 
               <div className="space-y-4">
-                {/* 목격 장소 */}
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-2">목격 장소</label>
                   <input 
@@ -199,8 +196,6 @@ function PWADetail() {
                     className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
                   />
                 </div>
-
-                {/* 목격 시간 - 날짜와 시간 분리 */}
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-2">목격 시간</label>
                   <div className="space-y-3">
@@ -226,7 +221,6 @@ function PWADetail() {
                   </div>
                 </div>
 
-                {/* 인상착의 */}
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-2">인상착의</label>
                   <input 
@@ -237,7 +231,6 @@ function PWADetail() {
                   />
                 </div>
 
-                {/* 기타 특이사항 */}
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-2">기타 특이사항</label>
                   <textarea 
@@ -247,8 +240,6 @@ function PWADetail() {
                     className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none text-xs"
                   />
                 </div>
-                
-                {/* 제보하기 버튼 */}
                 <button 
                   type="submit" 
                   className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 px-4 rounded-md font-medium active:scale-98 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 text-sm mt-6"

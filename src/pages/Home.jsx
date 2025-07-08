@@ -1,3 +1,9 @@
+/**
+ * Main Home Page with Voice-Activated AI Chat Interface
+ * Features Rive animation, voice recognition, TTS, and missing person report navigation.
+ * Handles permissions for microphone and location services.
+ */
+
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useRive } from '@rive-app/react-canvas'
 import { motion } from 'framer-motion'
@@ -23,12 +29,10 @@ function Home() {
   const { messages, sendMessage, isLoading, clearMessages } = useChat()
   const { speakText, stopSpeaking, initializeSpeech, initializeAudioContext } = useAdvancedTTS()
   
-  // 권한 요청 함수
   const requestPermissions = async () => {
     try {
       console.log('🎤 마이크 및 위치 권한 요청 시작...')
       
-      // 1. 마이크 권한 요청
       try {
         await navigator.mediaDevices.getUserMedia({ audio: true })
         console.log('✅ 마이크 권한 승인됨')
@@ -36,7 +40,6 @@ function Home() {
         console.log('❌ 마이크 권한 거부됨:', micError.message)
       }
       
-      // 2. 위치 권한 요청
       try {
         await new Promise((resolve, reject) => {
           if (!navigator.geolocation) {
@@ -80,21 +83,16 @@ function Home() {
 
   const handleChatBotToggle = async () => {
     if (!isChatMode) {
-      // 🔧 모바일에서 마이크 클릭 시 오디오 컨텍스트 초기화
       await initializeAudioContext()
       
       setIsChatMode(true)
-      // TTS 초기화
       initializeSpeech()
-      // 음성 인식 자동 시작
       startListening()
-      // 채팅 모드 시작 후 스크롤 초기화 (column-reverse)
       setTimeout(() => {
         if (chatScrollRef.current) {
           chatScrollRef.current.scrollTop = 0
         }
       }, 500)
-      // 타이머는 첫 번째 도로시 응답 완료 후에 시작됨
     } else {
       exitChatMode()
     }
@@ -132,7 +130,6 @@ function Home() {
           setTranscript(finalTranscript)
           handleSendMessage(finalTranscript)
           setTranscript('')
-          // 타이머는 handleSendMessage에서 도로시 응답 완료 후에 시작됨
         }
       }
 

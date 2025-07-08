@@ -1,3 +1,9 @@
+/**
+ * Missing Person Report PWA Main Page
+ * Displays a list of missing persons with search functionality and Rive animation.
+ * Fetches data from the government API and provides navigation to detail pages.
+ */
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRive } from '@rive-app/react-canvas';
@@ -15,14 +21,11 @@ function PWAIndex() {
     shouldDisableRiveListeners: false,
   });
 
-  // API 요청
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 로컬과 배포 모두 프록시 사용 (CORS 문제 해결)
         const baseUrl = '/api/lcm/findChildList.do';
         
-        // URL 파라미터 생성
         const params = new URLSearchParams({
           esntlId: import.meta.env.VITE_MISSING_PERSON_ESNTL_ID || 10000764,
           authKey: import.meta.env.VITE_MISSING_PERSON_AUTH_KEY || '197f67addf144f4e',
@@ -49,7 +52,6 @@ function PWAIndex() {
     fetchData();
   }, []);
 
-  // 날짜 포맷 함수
   const formatDate = (str) =>
     str && str.length === 8 ? `${str.slice(0, 4)}-${str.slice(4, 6)}-${str.slice(6, 8)}` : '날짜 없음';
 
@@ -78,7 +80,6 @@ function PWAIndex() {
   return (
     <div className="h-screen bg-white text-gray-800 flex justify-center overflow-hidden">
       <div className="w-full max-w-md flex flex-col px-6 py-8">
-        {/* 헤더 - 간격 조정 */}
         <div className="text-center mb-8">
           <motion.div 
             className="mb-0"
@@ -104,8 +105,6 @@ function PWAIndex() {
           >
             <img src="/dorosee_logo2.svg" alt="Dorosee Logo" className="h-8 mx-auto" />
           </motion.div>
-          
-          {/* 제보 플랫폼 타이틀 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -116,7 +115,6 @@ function PWAIndex() {
           </motion.div>
         </div>
         
-        {/* 실종자 카드 목록 - 스크롤 가능 */}
         <div className="flex-1 overflow-y-auto">
           <div className="space-y-4">
             {missingList.map((item, index) => {
@@ -141,7 +139,6 @@ function PWAIndex() {
                   whileTap={{ scale: 0.98 }}
                 >
                   <div className="flex gap-3">
-                    {/* 사진 영역 */}
                     <div className="flex-shrink-0">
                       {photo ? (
                         <img
@@ -161,17 +158,13 @@ function PWAIndex() {
                       )}
                     </div>
                     
-                    {/* 정보 영역 */}
                     <div className="flex-1 min-w-0">
-                      {/* 이름과 화살표 */}
                       <div className="flex justify-between items-start mb-3">
                         <h3 className="text-lg font-bold text-gray-900 truncate pr-2">{name}</h3>
                         <svg className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
                       </div>
-                      
-                      {/* 기본 정보 - 간단한 텍스트 형태 */}
                       <div className="space-y-2 text-xs">
                         <div className="flex justify-between">
                           <span className="text-gray-500">성별 · 나이</span>
@@ -191,7 +184,6 @@ function PWAIndex() {
                     </div>
                   </div>
                   
-                  {/* 하단 상태 표시 */}
                   <div className="mt-4 pt-3 border-t border-gray-200">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">

@@ -1,3 +1,8 @@
+/**
+ * Thank You Page for PWA Report Submission
+ * Displays success message after report submission and handles viewport reset for mobile.
+ */
+
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -5,17 +10,13 @@ import { motion } from 'framer-motion';
 function PWAThankYou() {
   const navigate = useNavigate();
 
-  // 🔧 페이지 로드 시 viewport 스케일 리셋 (모바일 줌 문제 해결)
   useEffect(() => {
     const resetViewport = () => {
-      // 기존 viewport meta 태그 찾기
       let viewport = document.querySelector('meta[name="viewport"]');
       
       if (viewport) {
-        // 기존 viewport를 일시적으로 업데이트
         viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
         
-        // 잠시 후 다시 원래대로 복원
         setTimeout(() => {
           viewport.setAttribute('content', 'width=device-width, initial-scale=1.0');
         }, 100);
@@ -34,7 +35,6 @@ function PWAThankYou() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          {/* 로고 */}
           <img src="/dorosee_logo2.svg" alt="Dorosee Logo" className="h-8 mx-auto mb-8" />
           
           <div className="mb-8">
@@ -53,8 +53,6 @@ function PWAThankYou() {
               소중한 정보를 제공해 주셔서 감사합니다.<br />
               빠르게 실종자를 찾을 수 있도록 노력하겠습니다.
             </p>
-            
-            {/* 버튼 */}
             <button 
               onClick={() => navigate('/pwa')}
               className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 px-4 rounded-md font-medium transition-colors text-sm"
