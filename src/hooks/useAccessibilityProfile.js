@@ -7,7 +7,7 @@ const useAccessibilityProfile = () => {
     elderly: false,
     cognitiveImpairment: false,
     language: 'ko',
-    fontSize: 'normal', // small, normal, large
+    fontSize: 'normal',
     highContrast: false,
     reduceMotion: false
   });
@@ -15,26 +15,23 @@ const useAccessibilityProfile = () => {
   const [interactionHistory, setInteractionHistory] = useState([]);
   const [autoDetectionEnabled, setAutoDetectionEnabled] = useState(true);
 
-  // 사용자 상호작용 기록
   const recordInteraction = useCallback((interaction) => {
     setInteractionHistory(prev => {
       const newHistory = [...prev, {
         ...interaction,
         timestamp: new Date().toISOString()
-      }].slice(-50); // 최근 50개만 유지
+      }].slice(-50);
       
       return newHistory;
     });
   }, []);
 
-  // 접근성 프로필 수동 설정
   const updateProfile = useCallback((updates) => {
     setProfile(prev => ({
       ...prev,
       ...updates
     }));
     
-    // 로컬 스토리지에 저장 (선택사항)
     try {
       localStorage.setItem('dorosee_accessibility_profile', JSON.stringify({
         ...profile,
@@ -45,30 +42,26 @@ const useAccessibilityProfile = () => {
     }
   }, [profile]);
 
-  // 자동 감지 로직
   const detectAccessibilityNeeds = useCallback(() => {
     if (!autoDetectionEnabled || interactionHistory.length < 5) {
       return profile;
     }
 
-    const recentHistory = interactionHistory.slice(-20); // 최근 20개 상호작용
+    const recentHistory = interactionHistory.slice(-20);
     const detectedProfile = { ...profile };
 
-    // 1. 시각장애 감지
     const voiceOnlyRatio = recentHistory.filter(h => h.type === 'voice').length / recentHistory.length;
     if (voiceOnlyRatio > 0.8 && !detectedProfile.visualImpairment) {
       detectedProfile.visualImpairment = true;
       console.log('시각장애 사용자로 감지됨 (음성 사용 비율:', voiceOnlyRatio, ')');
     }
 
-    // 2. 청각장애 감지
     const textOnlyRatio = recentHistory.filter(h => h.type === 'text').length / recentHistory.length;
     if (textOnlyRatio > 0.9 && !detectedProfile.hearingImpairment) {
       detectedProfile.hearingImpairment = true;
       console.log('청각장애 사용자로 감지됨 (텍스트 전용 비율:', textOnlyRatio, ')');
     }
 
-    // 3. 고령자 감지
     const formalLanguageCount = recentHistory.filter(h => 
       h.content && (
         h.content.includes('습니다') || 
@@ -86,7 +79,6 @@ const useAccessibilityProfile = () => {
       console.log('고령자 사용자로 감지됨 (정중한 언어:', formalRatio, ', 느린 응답:', slowRatio, ')');
     }
 
-    // 4. 인지장애 감지
     const repetitionCount = recentHistory.filter(h => 
       h.content && (
         h.content.includes('다시') ||
@@ -102,7 +94,6 @@ const useAccessibilityProfile = () => {
       console.log('인지적 지원이 필요한 사용자로 감지됨 (반복 요청:', repetitionCount, ')');
     }
 
-    // 감지된 변화가 있으면 프로필 업데이트
     if (JSON.stringify(detectedProfile) !== JSON.stringify(profile)) {
       setProfile(detectedProfile);
     }
@@ -110,21 +101,17 @@ const useAccessibilityProfile = () => {
     return detectedProfile;
   }, [interactionHistory, autoDetectionEnabled, profile]);
 
-  // 브라우저 접근성 설정 감지
   const detectBrowserAccessibilitySettings = useCallback(() => {
     const updates = {};
 
-    // 고대비 모드 감지
     if (window.matchMedia && window.matchMedia('(prefers-contrast: high)').matches) {
       updates.highContrast = true;
     }
 
-    // 모션 감소 설정 감지
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       updates.reduceMotion = true;
     }
 
-    // 폰트 크기 설정 감지 (대략적)
     const fontSize = window.getComputedStyle(document.documentElement).fontSize;
     const fontSizeValue = parseFloat(fontSize);
     if (fontSizeValue > 18) {
@@ -138,7 +125,6 @@ const useAccessibilityProfile = () => {
     }
   }, [updateProfile]);
 
-  // 음성 명령 처리를 위한 헬퍼
   const handleVoiceCommand = useCallback((command, responseTime = 0) => {
     recordInteraction({
       type: 'voice',
@@ -147,7 +133,6 @@ const useAccessibilityProfile = () => {
     });
   }, [recordInteraction]);
 
-  // 텍스트 입력 처리를 위한 헬퍼
   const handleTextInput = useCallback((text, responseTime = 0) => {
     recordInteraction({
       type: 'text',
@@ -156,7 +141,6 @@ const useAccessibilityProfile = () => {
     });
   }, [recordInteraction]);
 
-  // 터치/클릭 상호작용 처리
   const handleTouchInteraction = useCallback((element, responseTime = 0) => {
     recordInteraction({
       type: 'touch',
@@ -165,7 +149,6 @@ const useAccessibilityProfile = () => {
     });
   }, [recordInteraction]);
 
-  // 접근성 권장사항 생성
   const getAccessibilityRecommendations = useCallback(() => {
     const recommendations = [];
 
@@ -204,7 +187,6 @@ const useAccessibilityProfile = () => {
     return recommendations;
   }, [profile]);
 
-  // 프로필 초기화 (로컬 스토리지에서 로드)
   useEffect(() => {
     try {
       const savedProfile = localStorage.getItem('dorosee_accessibility_profile');
@@ -216,11 +198,9 @@ const useAccessibilityProfile = () => {
       console.log('프로필 로드 실패:', error);
     }
 
-    // 브라우저 접근성 설정 감지
     detectBrowserAccessibilitySettings();
   }, [detectBrowserAccessibilitySettings]);
 
-  // 자동 감지 실행 (상호작용 히스토리가 변경될 때)
   useEffect(() => {
     if (autoDetectionEnabled && interactionHistory.length > 0) {
       detectAccessibilityNeeds();
@@ -237,7 +217,7 @@ const useAccessibilityProfile = () => {
     getAccessibilityRecommendations,
     setAutoDetectionEnabled,
     autoDetectionEnabled,
-    interactionHistory: interactionHistory.slice(-10) // 최근 10개만 외부 노출
+    interactionHistory: interactionHistory.slice(-10)
   };
 };
 

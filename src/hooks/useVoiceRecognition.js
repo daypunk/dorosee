@@ -8,7 +8,6 @@ const useVoiceRecognition = () => {
   const initializeRecognition = useCallback(() => {
     console.log('음성인식 초기화 시작...');
     
-    // 브라우저 지원 확인
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
       console.error('브라우저에서 음성인식을 지원하지 않습니다.');
       setVoiceStatus('음성인식 미지원');
@@ -19,9 +18,8 @@ const useVoiceRecognition = () => {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
       
-      // 기본 설정
-      recognitionRef.current.continuous = false; // true에서 false로 변경
-      recognitionRef.current.interimResults = false; // true에서 false로 변경
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
       recognitionRef.current.lang = 'ko-KR';
       recognitionRef.current.maxAlternatives = 1;
       
@@ -49,7 +47,6 @@ const useVoiceRecognition = () => {
       return;
     }
 
-    // 이벤트 핸들러 설정
     recognitionRef.current.onstart = () => {
       console.log('음성인식 시작됨');
       setIsListening(true);
@@ -103,7 +100,6 @@ const useVoiceRecognition = () => {
       setVoiceStatus('준비됨');
     };
 
-    // 음성인식 시작
     try {
       console.log('음성인식 start() 호출');
       recognitionRef.current.start();
@@ -121,7 +117,6 @@ const useVoiceRecognition = () => {
     }
   }, [isListening]);
 
-  // 음성인식 지원 여부 확인
   const isSupported = useCallback(() => {
     return ('webkitSpeechRecognition' in window) || ('SpeechRecognition' in window);
   }, []);

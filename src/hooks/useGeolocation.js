@@ -12,7 +12,6 @@ const useGeolocation = () => {
       return;
     }
 
-    // 위치 권한 요청 및 현재 위치 가져오기
     const getCurrentPosition = () => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -45,16 +44,15 @@ const useGeolocation = () => {
           console.error('위치 오류:', errorMessage);
         },
         {
-          enableHighAccuracy: true, // 고정밀 위치
-          timeout: 10000, // 10초 타임아웃
-          maximumAge: 300000 // 5분간 캐시
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 300000
         }
       );
     };
 
     getCurrentPosition();
 
-    // 실시간 위치 추적 (선택적)
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
         setLocation({
@@ -68,9 +66,9 @@ const useGeolocation = () => {
         console.warn('위치 추적 오류:', error.message);
       },
       {
-        enableHighAccuracy: false, // 배터리 절약
+        enableHighAccuracy: false,
         timeout: 20000,
-        maximumAge: 600000 // 10분간 캐시
+        maximumAge: 600000
       }
     );
 
@@ -102,7 +100,7 @@ const useGeolocation = () => {
       {
         enableHighAccuracy: true,
         timeout: 10000,
-        maximumAge: 0 // 캐시 사용 안함
+        maximumAge: 0
       }
     );
   };

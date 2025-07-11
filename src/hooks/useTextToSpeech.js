@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 
 const useTextToSpeech = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [ttsMode, setTtsMode] = useState('openai'); // 'web' 또는 'openai'
+  const [ttsMode, setTtsMode] = useState('openai');
   const synthRef = useRef(null);
   const audioRef = useRef(null);
 
@@ -12,7 +12,6 @@ const useTextToSpeech = () => {
     }
   }, []);
 
-  // OpenAI TTS 사용
   const speakWithOpenAI = useCallback(async (text) => {
     const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
     if (!apiKey || !apiKey.startsWith('sk-')) {
@@ -31,10 +30,10 @@ const useTextToSpeech = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'tts-1', // tts-1-hd는 고품질이지만 느림
+          model: 'tts-1',
           input: text,
-          voice: 'nova', // 가장 밝고 명랑한 여성 음성 (shimmer보다 더 밝음)
-          speed: 1.2 // 더 빠르고 활발하게
+          voice: 'nova',
+          speed: 1.2
         }),
       });
 
@@ -45,7 +44,6 @@ const useTextToSpeech = () => {
       const audioBlob = await response.blob();
       const audioUrl = URL.createObjectURL(audioBlob);
       
-      // 기존 오디오 정지
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;
@@ -55,7 +53,7 @@ const useTextToSpeech = () => {
       
       audioRef.current.onended = () => {
         setIsSpeaking(false);
-        URL.revokeObjectURL(audioUrl); // 메모리 정리
+        URL.revokeObjectURL(audioUrl);
         console.log('OpenAI TTS 재생 완료');
       };
 
@@ -71,26 +69,22 @@ const useTextToSpeech = () => {
     } catch (error) {
       console.error('OpenAI TTS 오류:', error);
       setIsSpeaking(false);
-      // 오류 시 Web TTS로 대체
       speakWithWeb(text);
     }
   }, []);
 
-  // 기존 Web Speech API TTS
   const speakWithWeb = useCallback((text) => {
     if (!synthRef.current) return;
 
     try {
-      // 기존 음성 중지
       synthRef.current.cancel();
 
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'ko-KR';
-      utterance.rate = 1.1; // 조금 더 빠르게
-      utterance.pitch = 1.3; // 더 밝고 명랑하게
+      utterance.rate = 1.1;
+      utterance.pitch = 1.3;
       utterance.volume = 1.0;
 
-      // 한국어 여성 음성 중 가장 명랑한 음성 선택
       const voices = synthRef.current.getVoices();
       const koreanFemaleVoices = voices.filter(voice => 
         voice.lang.includes('ko') && 
@@ -98,7 +92,6 @@ const useTextToSpeech = () => {
       );
       
       if (koreanFemaleVoices.length > 0) {
-        // 명랑한 이름을 가진 음성 우선 선택
         const brightVoice = koreanFemaleVoices.find(voice => 
           voice.name.includes('Yuna') || voice.name.includes('Kyuri') || voice.name.includes('Heami')
         ) || koreanFemaleVoices[0];
@@ -132,7 +125,6 @@ const useTextToSpeech = () => {
     }
   }, []);
 
-  // 메인 TTS 함수
   const speakText = useCallback((text) => {
     if (!text) return;
 
@@ -144,12 +136,10 @@ const useTextToSpeech = () => {
   }, [ttsMode, speakWithOpenAI, speakWithWeb]);
 
   const stopSpeaking = useCallback(() => {
-    // Web TTS 중지
     if (synthRef.current) {
       synthRef.current.cancel();
     }
     
-    // OpenAI TTS 중지
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
@@ -158,9 +148,8 @@ const useTextToSpeech = () => {
     setIsSpeaking(false);
   }, []);
 
-  // TTS 모드 변경
   const switchTTSMode = useCallback((mode) => {
-    stopSpeaking(); // 재생 중인 음성 중지
+    stopSpeaking();
     setTtsMode(mode);
     console.log(`TTS 모드 변경: ${mode}`);
   }, [stopSpeaking]);

@@ -8,7 +8,6 @@ export const useChat = () => {
   const sendMessage = useCallback(async (userMessage) => {
     if (!userMessage.trim()) return null
 
-    // 사용자 메시지 추가
     const userMsg = {
       type: 'user',
       content: userMessage,
@@ -18,28 +17,22 @@ export const useChat = () => {
     setMessages(prev => [...prev, userMsg])
     setIsLoading(true)
 
-    // 최소 2초 고민 시간을 위한 타이머 시작
     const startTime = Date.now()
-    const minThinkingTime = 2000 // 2초
+    const minThinkingTime = 2000
 
     try {
-      // 위치 정보 가져오기
       const location = await getCurrentLocation()
       
-      // accessibilityProfile에 위치 정보 포함
       const accessibilityProfile = location ? { location } : {}
       
-      // AI 서비스로 응답 생성
       const response = await aiService.generateResponse(userMessage, accessibilityProfile)
 
-      // 최소 2초가 지났는지 확인하고, 부족하면 추가 대기
       const elapsedTime = Date.now() - startTime
       const remainingTime = minThinkingTime - elapsedTime
       if (remainingTime > 0) {
         await new Promise(resolve => setTimeout(resolve, remainingTime))
       }
 
-      // AI 응답 추가
       const aiMsg = {
         type: 'ai',
         content: response,
@@ -53,7 +46,6 @@ export const useChat = () => {
     } catch (error) {
       console.error('채팅 메시지 전송 오류:', error)
       
-      // 오류 발생 시에도 최소 2초 대기
       const elapsedTime = Date.now() - startTime
       const remainingTime = minThinkingTime - elapsedTime
       if (remainingTime > 0) {
