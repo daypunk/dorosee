@@ -1,9 +1,3 @@
-/**
- * Missing Person Report Detail Page
- * Displays detailed information about a missing person and provides a report submission form
- * with date/time pickers for witness information.
- */
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -114,8 +108,8 @@ function PWADetail() {
               </svg>
               <span className="text-sm">목록으로</span>
             </button>
-          </div>
-          
+        </div>
+
           <div className="text-center">
             <img src="/dorosee_logo2.svg" alt="Dorosee Logo" className="h-8 mx-auto mb-4" />
             <h1 className="text-lg font-semibold text-gray-800">실종자 제보</h1>
@@ -189,8 +183,8 @@ function PWADetail() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-2">목격 장소</label>
-                  <input 
-                    type="text" 
+                <input 
+                  type="text" 
                     placeholder="목격한 구체적인 장소를 입력하세요" 
                     required 
                     className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
@@ -204,41 +198,41 @@ function PWADetail() {
                         type="date" 
                         value={dateValue}
                         onChange={(e) => setDateValue(e.target.value)}
-                        required 
+                  required 
                         max={new Date().toISOString().split('T')[0]}
                         className="w-52 px-3 py-4 h-11 bg-white border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
-                      />
+                />
                     </div>
                     <div>
-                      <input 
+                <input 
                         type="time" 
                         value={timeValue}
                         onChange={(e) => setTimeValue(e.target.value)}
-                        required 
+                  required 
                         className="w-52 px-3 py-4 h-11 bg-white border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
-                      />
+                />
                     </div>
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-2">인상착의</label>
-                  <input 
-                    type="text" 
+                <input 
+                  type="text" 
                     placeholder="옷차림, 특징 등을 입력하세요" 
-                    required 
+                  required 
                     className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs"
-                  />
+                />
                 </div>
 
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-2">기타 특이사항</label>
-                  <textarea 
+                <textarea 
                     placeholder="함께 있던 사람, 상황, 행동 등 추가 정보를 입력하세요" 
-                    required 
-                    rows="3"
+                  required 
+                  rows="3"
                     className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none text-xs"
-                  />
+                />
                 </div>
                 <button 
                   type="submit" 

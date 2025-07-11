@@ -1,9 +1,3 @@
-/**
- * Missing Person Report PWA Main Page
- * Displays a list of missing persons with search functionality and Rive animation.
- * Fetches data from the government API and provides navigation to detail pages.
- */
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRive } from '@rive-app/react-canvas';
@@ -191,8 +185,8 @@ function PWAIndex() {
                         <span className="text-xs font-medium text-gray-700">실종 신고</span>
                       </div>
                       <span className="text-xs text-gray-500">자세히 보기</span>
-                    </div>
                   </div>
+                </div>
                 </motion.div>
               );
             })}

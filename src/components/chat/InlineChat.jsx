@@ -12,7 +12,6 @@ const InlineChat = ({ isOpen, onClose }) => {
   const recognitionRef = useRef(null)
 
   useEffect(() => {
-    // TTS 초기화
     initializeSpeech()
     
     if (isOpen) {
@@ -72,7 +71,6 @@ const InlineChat = ({ isOpen, onClose }) => {
   const handleSendMessage = async (message) => {
     const response = await sendMessage(message)
     if (response) {
-      // TTS로 응답 읽어주기
       speakText(response)
     }
   }
@@ -94,9 +92,7 @@ const InlineChat = ({ isOpen, onClose }) => {
           exit={{ opacity: 0, y: 20, scale: 0.9 }}
           className="absolute bottom-28 left-1/2 transform -translate-x-1/2 w-80 max-w-sm"
         >
-          {/* 말풍선 */}
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
-            {/* 헤더 */}
             <div className="bg-slate-800 text-white p-3 flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
@@ -110,7 +106,6 @@ const InlineChat = ({ isOpen, onClose }) => {
               </button>
             </div>
 
-            {/* 메시지 영역 */}
             <div className="h-64 overflow-y-auto p-4 space-y-3">
               {messages.length === 0 && (
                 <div className="text-center text-slate-500 text-sm">
@@ -148,7 +143,6 @@ const InlineChat = ({ isOpen, onClose }) => {
               )}
             </div>
 
-            {/* 음성 인식 상태 */}
             <div className="p-3 bg-slate-50 border-t border-slate-200">
               <div className="flex items-center justify-center space-x-3">
                 <button
@@ -183,7 +177,6 @@ const InlineChat = ({ isOpen, onClose }) => {
             </div>
           </div>
 
-          {/* 말풍선 꼬리 */}
           <div className="flex justify-center">
             <div className="w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-white"></div>
           </div>

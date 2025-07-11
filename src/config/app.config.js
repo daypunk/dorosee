@@ -1,6 +1,3 @@
-// 🎛️ 도로시 V3 중앙 설정 파일
-
-// API 엔드포인트 설정
 export const API_CONFIG = {
   OPENAI: {
     ENDPOINT: 'https://api.openai.com/v1/chat/completions',
@@ -14,25 +11,23 @@ export const API_CONFIG = {
   }
 };
 
-// TTS 설정
 export const TTS_CONFIG = {
-  DEFAULT_MODE: 'openai',   // 기본 TTS 모드: OpenAI
+  DEFAULT_MODE: 'openai',
   VOICES: {
-    ACTIVE: 'nova',         // 활발한 여성 음성 (OpenAI)
+    ACTIVE: 'nova',
     ALTERNATIVES: ['shimmer', 'alloy', 'echo', 'fable', 'onyx']
   },
   SETTINGS: {
-    SPEED: 1.2,             // 조금 빠르게
-    TEMPERATURE: 0.8,       // 활발한 표현
+    SPEED: 1.2,
+    TEMPERATURE: 0.8,
     MAX_TOKENS: {
-      WEATHER: 50,          // 🎯 날씨는 매우 간결하게
-      SPECIALTY: 60,        // 🎯 전문분야도 짧게
-      GENERAL: 60           // 🎯 일반 대화도 짧게
+      WEATHER: 50,
+      SPECIALTY: 60,
+      GENERAL: 60
     }
   }
 };
 
-// 음성인식 설정
 export const STT_CONFIG = {
   LANGUAGE: 'ko-KR',
   CONTINUOUS: false,
@@ -40,7 +35,6 @@ export const STT_CONFIG = {
   MAX_ALTERNATIVES: 1
 };
 
-// 캐릭터 설정
 export const CHARACTER_CONFIG = {
   NAME: '도로시',
   AGE: '20대',
@@ -49,7 +43,6 @@ export const CHARACTER_CONFIG = {
   TONE: 'friendly_energetic'
 };
 
-// 키워드 설정
 export const KEYWORDS = {
   EMERGENCY: [
     '화재', '불', '사고', '쓰러진', '쓰러져', '심장마비', '지진', 
@@ -76,13 +69,12 @@ export const KEYWORDS = {
   ]
 };
 
-// 앱 설정
 export const APP_CONFIG = {
   NAME: '도로시 Enhanced v3.0',
   VERSION: '3.0.0',
   DESCRIPTION: 'AI & 무인이동체 활용 시민 안전 서비스',
   MAX_MESSAGE_LENGTH: 500,
-  CACHE_DURATION: 5 * 60 * 1000, // 5분
+  CACHE_DURATION: 5 * 60 * 1000,
   DEFAULT_LOCATION: {
     latitude: 37.5665,
     longitude: 126.9780,
@@ -90,7 +82,6 @@ export const APP_CONFIG = {
   }
 };
 
-// 환경 변수 검증 (간소화)
 export const validateEnvironment = () => {
   const required = [
     'VITE_OPENAI_API_KEY',

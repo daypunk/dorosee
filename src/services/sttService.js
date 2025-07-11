@@ -1,4 +1,3 @@
-// STT 서비스 (음성인식)
 class STTService {
   constructor() {
     this.recognition = null;
@@ -21,7 +20,6 @@ class STTService {
     this.recognition.maxAlternatives = 1;
   }
 
-  // 음성인식 시작
   startListening(callbacks = {}) {
     if (!this.recognition) {
       throw new Error('음성인식이 지원되지 않습니다');
@@ -31,7 +29,6 @@ class STTService {
       this.stopListening();
     }
 
-    // 콜백 설정
     this.recognition.onstart = () => {
       this.isListening = true;
       callbacks.onStart?.();
@@ -56,19 +53,16 @@ class STTService {
     this.recognition.start();
   }
 
-  // 음성인식 중지
   stopListening() {
     if (this.recognition && this.isListening) {
       this.recognition.stop();
     }
   }
 
-  // 음성인식 상태
   getIsListening() {
     return this.isListening;
   }
 
-  // 음성인식 지원 여부
   isSupported() {
     return !!this.recognition;
   }

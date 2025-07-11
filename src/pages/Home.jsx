@@ -1,9 +1,3 @@
-/**
- * Main Home Page with Voice-Activated AI Chat Interface
- * Features Rive animation, voice recognition, TTS, and missing person report navigation.
- * Handles permissions for microphone and location services.
- */
-
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useRive } from '@rive-app/react-canvas'
 import { motion } from 'framer-motion'
@@ -318,7 +312,7 @@ function Home() {
                       <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
                       <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                     </div>
-                  </div>
+                </div>
                 </motion.div>
               )}
               
@@ -366,7 +360,7 @@ function Home() {
               {messages.length === 0 && (
                 <div className="text-center text-slate-300 text-lg pt-8">
                   안녕하세요! 무엇을 도와드릴까요?
-                </div>
+                  </div>
               )}
             </div>
           </div>
@@ -375,12 +369,12 @@ function Home() {
 
       
         {/* 메인 마이크 버튼 - 절대 위치로 하단 완전 고정 */}
-        <motion.div 
+      <motion.div 
           className="absolute bottom-8 left-0 right-0 flex justify-center z-20"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-        >
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.6 }}
+      >
 
         
         <button 

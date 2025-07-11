@@ -1,8 +1,3 @@
-/**
- * Thank You Page for PWA Report Submission
- * Displays success message after report submission and handles viewport reset for mobile.
- */
-
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';

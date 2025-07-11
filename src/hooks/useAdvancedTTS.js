@@ -46,51 +46,51 @@ const useAdvancedTTS = () => {
     if (!synthRef.current) return Promise.resolve();
 
     return new Promise((resolve) => {
-      try {
-        synthRef.current.cancel();
+    try {
+      synthRef.current.cancel();
 
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'ko-KR';
-        utterance.rate = 1.1;
-        utterance.pitch = 1.3;
-        utterance.volume = 1.0;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'ko-KR';
+      utterance.rate = 1.1;
+      utterance.pitch = 1.3;
+      utterance.volume = 1.0;
 
-        const voices = synthRef.current.getVoices();
-        const koreanFemaleVoices = voices.filter(voice => 
-          voice.lang.includes('ko') && 
-          (voice.name.includes('Female') || voice.name.includes('여') || voice.name.includes('Yuna') || voice.name.includes('Heami'))
-        );
-        
-        if (koreanFemaleVoices.length > 0) {
-          const brightVoice = koreanFemaleVoices.find(voice => 
-            voice.name.includes('Yuna') || voice.name.includes('Kyuri') || voice.name.includes('Heami')
-          ) || koreanFemaleVoices[0];
-          utterance.voice = brightVoice;
-        }
-
-        utterance.onstart = () => {
-          setIsSpeaking(true);
-          console.log('웹 TTS 시작:', text.substring(0, 30) + '...');
-        };
-
-        utterance.onend = () => {
-          setIsSpeaking(false);
-          console.log('웹 TTS 완료');
-          resolve(); // 재생 완료 시 Promise 해결
-        };
-
-        utterance.onerror = () => {
-          setIsSpeaking(false);
-          console.error('웹 TTS 오류');
-          resolve(); // 오류 시에도 Promise 해결
-        };
-
-        synthRef.current.speak(utterance);
-      } catch (error) {
-        console.error('웹 TTS 오류:', error);
-        setIsSpeaking(false);
-        resolve(); // 예외 시에도 Promise 해결
+      const voices = synthRef.current.getVoices();
+      const koreanFemaleVoices = voices.filter(voice => 
+        voice.lang.includes('ko') && 
+        (voice.name.includes('Female') || voice.name.includes('여') || voice.name.includes('Yuna') || voice.name.includes('Heami'))
+      );
+      
+      if (koreanFemaleVoices.length > 0) {
+        const brightVoice = koreanFemaleVoices.find(voice => 
+          voice.name.includes('Yuna') || voice.name.includes('Kyuri') || voice.name.includes('Heami')
+        ) || koreanFemaleVoices[0];
+        utterance.voice = brightVoice;
       }
+
+      utterance.onstart = () => {
+        setIsSpeaking(true);
+        console.log('웹 TTS 시작:', text.substring(0, 30) + '...');
+      };
+
+      utterance.onend = () => {
+        setIsSpeaking(false);
+        console.log('웹 TTS 완료');
+          resolve(); // 재생 완료 시 Promise 해결
+      };
+
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+        console.error('웹 TTS 오류');
+          resolve(); // 오류 시에도 Promise 해결
+      };
+
+      synthRef.current.speak(utterance);
+    } catch (error) {
+      console.error('웹 TTS 오류:', error);
+      setIsSpeaking(false);
+        resolve(); // 예외 시에도 Promise 해결
+    }
     });
   }, []);
 
@@ -148,23 +148,23 @@ const useAdvancedTTS = () => {
       
       // Promise로 재생 완료를 기다림
       return new Promise((resolve, reject) => {
-        audioRef.current.onended = () => {
-          setIsSpeaking(false);
-          URL.revokeObjectURL(audioUrl);
-          console.log('OpenAI TTS 재생 완료');
+      audioRef.current.onended = () => {
+        setIsSpeaking(false);
+        URL.revokeObjectURL(audioUrl);
+        console.log('OpenAI TTS 재생 완료');
           resolve();
-        };
+      };
 
-        audioRef.current.onerror = () => {
-          setIsSpeaking(false);
-          URL.revokeObjectURL(audioUrl);
-          console.error('OpenAI TTS 재생 오류');
+      audioRef.current.onerror = () => {
+        setIsSpeaking(false);
+        URL.revokeObjectURL(audioUrl);
+        console.error('OpenAI TTS 재생 오류');
           resolve(); // 오류 시에도 resolve
-        };
+      };
 
         // 🔧 모바일에서 재생 실패 시 웹 TTS로 fallback
         audioRef.current.play().then(() => {
-          console.log('OpenAI TTS 재생 시작');
+      console.log('OpenAI TTS 재생 시작');
         }).catch((playError) => {
           console.error('OpenAI TTS 재생 시작 오류:', playError);
           setIsSpeaking(false);
@@ -229,22 +229,22 @@ const useAdvancedTTS = () => {
       
       // Promise로 재생 완료를 기다림
       return new Promise((resolve, reject) => {
-        audioRef.current.onended = () => {
-          setIsSpeaking(false);
-          URL.revokeObjectURL(audioUrl);
-          console.log('TTSMaker TTS 재생 완료');
+      audioRef.current.onended = () => {
+        setIsSpeaking(false);
+        URL.revokeObjectURL(audioUrl);
+        console.log('TTSMaker TTS 재생 완료');
           resolve();
-        };
+      };
 
-        audioRef.current.onerror = () => {
-          setIsSpeaking(false);
-          URL.revokeObjectURL(audioUrl);
-          console.error('TTSMaker TTS 재생 오류');
+      audioRef.current.onerror = () => {
+        setIsSpeaking(false);
+        URL.revokeObjectURL(audioUrl);
+        console.error('TTSMaker TTS 재생 오류');
           resolve(); // 오류 시에도 resolve
-        };
+      };
 
         audioRef.current.play().then(() => {
-          console.log('TTSMaker TTS 재생 시작');
+      console.log('TTSMaker TTS 재생 시작');
         }).catch((playError) => {
           console.error('TTSMaker TTS 재생 시작 오류:', playError);
           setIsSpeaking(false);

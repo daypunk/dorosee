@@ -1,4 +1,3 @@
-// 에러 처리 유틸리티
 export const withErrorBoundary = (fn, fallback = null) => {
   try {
     return fn();
@@ -8,7 +7,6 @@ export const withErrorBoundary = (fn, fallback = null) => {
   }
 };
 
-// 재시도 로직
 export const retryOperation = async (operation, maxRetries = 3, delay = 1000) => {
   for (let i = 0; i < maxRetries; i++) {
     try {
@@ -20,7 +18,6 @@ export const retryOperation = async (operation, maxRetries = 3, delay = 1000) =>
   }
 };
 
-// 디바운싱
 export const debounce = (func, wait) => {
   let timeout;
   return function executedFunction(...args) {

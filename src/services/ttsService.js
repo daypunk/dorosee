@@ -1,23 +1,19 @@
-// TTS 서비스 (브라우저 내장 + 외부 API)
 class TTSService {
   constructor() {
     this.synth = window.speechSynthesis;
     this.currentUtterance = null;
   }
 
-  // 이모지 및 특수문자 제거 (TTS용 텍스트 정제)
   cleanTextForTTS(text) {
-    // 이모지 제거 (유니코드 이모지 범위)
     const emojiRegex = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu;
     
     return text
-      .replace(emojiRegex, '') // 이모지 제거
-      .replace(/[🔥⭐✨🎉💝❤️💖💕😊😀😄😆😍🥰😘😉😋😎🤗🙌👍👏💪🎯🚀]/g, '') // 추가 이모지
-      .replace(/\s+/g, ' ') // 연속 공백 정리
-      .trim(); // 앞뒤 공백 제거
+      .replace(emojiRegex, '')
+      .replace(/[🔥⭐✨🎉💝❤️💖💕😊😀😄😆😍🥰😘😉😋😎🤗🙌👍👏💪🎯🚀]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 
-  // 브라우저 내장 TTS (기본)
   speakBrowser(text, options = {}) {
     return new Promise((resolve, reject) => {
       if (!this.synth) {
@@ -25,10 +21,8 @@ class TTSService {
         return;
       }
 
-      // 기존 음성 중지
       this.synth.cancel();
 
-      // TTS용 텍스트 정제
       const cleanText = this.cleanTextForTTS(text);
       const utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.lang = options.lang || 'ko-KR';
@@ -44,7 +38,6 @@ class TTSService {
     });
   }
 
-  // OpenAI TTS (고품질)
   async speakOpenAI(text, options = {}) {
     const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
     
@@ -54,7 +47,6 @@ class TTSService {
     }
 
     try {
-      // TTS용 텍스트 정제
       const cleanText = this.cleanTextForTTS(text);
       
       const response = await fetch('https://api.openai.com/v1/audio/speech', {
@@ -85,10 +77,8 @@ class TTSService {
     }
   }
 
-  // TTSMaker API (고품질)
   async speakTTSMaker(text, options = {}) {
     try {
-      // TTS용 텍스트 정제
       const cleanText = this.cleanTextForTTS(text);
       
       const response = await fetch('https://api.ttsmaker.com/v1/speech', {
@@ -119,7 +109,6 @@ class TTSService {
     }
   }
 
-  // 오디오 재생
   playAudio(audioUrl) {
     return new Promise((resolve, reject) => {
       const audio = new Audio(audioUrl);
@@ -135,19 +124,16 @@ class TTSService {
     });
   }
 
-  // 음성 중지
   stop() {
     if (this.synth) {
       this.synth.cancel();
     }
   }
 
-  // 사용 가능한 음성 목록
   getVoices() {
     return this.synth ? this.synth.getVoices() : [];
   }
 
-  // 자동 TTS (OpenAI → 브라우저 fallback)
   async speak(text, options = {}) {
     const openaiKey = import.meta.env.VITE_OPENAI_API_KEY;
     

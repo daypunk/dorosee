@@ -13,7 +13,6 @@ const TTSModeSelector = ({ currentMode, availableModes, onModeChange, isSpeaking
 
   return (
     <div className="relative">
-      {/* 현재 모드 버튼 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm transition-colors ${
@@ -42,7 +41,6 @@ const TTSModeSelector = ({ currentMode, availableModes, onModeChange, isSpeaking
         </svg>
       </button>
 
-      {/* 모드 선택 드롭다운 */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -75,7 +73,6 @@ const TTSModeSelector = ({ currentMode, availableModes, onModeChange, isSpeaking
               ))}
             </div>
             
-            {/* 하단 정보 */}
             <div className="border-t border-slate-600 p-2">
               <div className="text-xs text-slate-400 text-center">
                 사용 가능한 모드: {availableModes.length}개
@@ -85,7 +82,6 @@ const TTSModeSelector = ({ currentMode, availableModes, onModeChange, isSpeaking
         )}
       </AnimatePresence>
 
-      {/* 오버레이 */}
       {isOpen && (
         <div 
           className="fixed inset-0 z-40" 
